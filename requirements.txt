@@ -1,0 +1,9 @@
+Flask
+Flask-SQLAlchemy
+apscheduler
+razorpay
+werkzeug
+google-genai
+python-dotenv
+cryptography
+psycopg2-binary

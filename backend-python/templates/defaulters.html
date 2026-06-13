@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">🚨 Defaulter List</h2>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Student ID</th>
+            <th>Name</th>
+            <th>Total Fee</th>
+            <th>Paid</th>
+            <th>Due</th>
+            <th>Status</th>
+            <th>Deadline</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for f in data %}
+        <tr>
+            <td>{{ f.student_id }}</td>
+            <td>{{ f.name }}</td>
+            <td>₹{{ f.total_fee }}</td>
+            <td>₹{{ f.paid }}</td>
+            <td>₹{{ f.due }}</td>
+
+            <td>
+                <span class="badge bg-danger">{{ f.status }}</span>
+            </td>
+
+            <td>
+                {{ f.deadline.strftime("%Y-%m-%d") }}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if data|length == 0 %}
+<div class="alert alert-success mt-3">
+    🎉 No defaulters found!
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Fee System</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            /* Purple to pink gradient background as seen in the image */
+            background: linear-gradient(135deg, #6b52d1 0%, #b862c9 50%, #f77c8e 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-card {
+            display: flex;
+            background: rgba(30, 30, 47, 0.95);
+            backdrop-filter: blur(10px);
+            color: #ffffff;
+            width: 900px;
+            max-width: 90%;
+            height: 550px;
+            border-radius: 15px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            animation: scaleIn 0.5s ease-out;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Left Side: Completely replaced with College Image/Logo */
+        .left-side {
+            flex: 1;
+            background: url('/static/img/college_bg.jpg') no-repeat center center;
+            background-size: contain; /* Ensures the whole logo is visible */
+            background-color: #ffffff; /* Keeping the image background white if the logo is not transparent, but adding border radius */
+            border-radius: 15px;
+            margin: 30px; /* Adds breathing room around the logo */
+        }
+
+        /* Right Side: Login Form */
+        .right-side {
+            flex: 1;
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: transparent;
+            position: relative;
+        }
+
+        .right-side h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #e2d8fa;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .input-group-custom {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group-custom i {
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%);
+            color: #b39ddb;
+            font-size: 1.1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            background: #2a2a40;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 12px 20px 12px 50px;
+            font-size: 0.95rem;
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .form-control::placeholder {
+            color: #8b8b99;
+        }
+
+        .form-control:focus {
+            background: #32324e;
+            box-shadow: 0 0 0 3px rgba(179, 157, 219, 0.3);
+            border-color: rgba(179, 157, 219, 0.5);
+            outline: none;
+            color: #ffffff;
+        }
+
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #8b8b99;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+        }
+
+        .toggle-password:hover {
+            color: #b39ddb;
+        }
+
+        .btn-login {
+            background: linear-gradient(90deg, #9b51e0, #de5eb0);
+            border: none;
+            color: white;
+            border-radius: 30px;
+            padding: 12px;
+            font-weight: 600;
+            width: 150px;
+            display: block;
+            margin: 30px auto 0;
+            box-shadow: 0 10px 20px rgba(155, 81, 224, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(155, 81, 224, 0.4);
+            color: white;
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .links-container {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .links-container a {
+            color: #b39ddb;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .links-container a:hover {
+            color: #de5eb0;
+        }
+
+        .alert-custom {
+            border-radius: 15px;
+            font-size: 0.85rem;
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .login-card {
+                flex-direction: column;
+                height: auto;
+                width: 90%;
+            }
+            .left-side {
+                height: 250px;
+                flex: none;
+            }
+            .right-side {
+                padding: 40px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <!-- Left Side: College Logo/Image filling the entire box -->
+    <div class="left-side"></div>
+
+    <!-- Right Side: Login Form -->
+    <div class="right-side">
+        <div class="form-container">
+            <h2 id="loginTitle">Admin Login</h2>
+
+            {% if msg == 'verified' %}
+            <div class="alert alert-success alert-custom" role="alert">
+                Account successfully verified! Please log in.
+            </div>
+            {% endif %}
+
+            {% if msg == 'password_reset' %}
+            <div class="alert alert-success alert-custom" role="alert">
+                Password reset successfully! Please log in with your new password.
+            </div>
+            {% endif %}
+
+            {% if error %}
+            <div class="alert alert-danger alert-custom" role="alert" id="error-alert">
+                {{ error }}
+            </div>
+            <script>
+                setTimeout(() => {
+                    const errorAlert = document.getElementById('error-alert');
+                    if(errorAlert) {
+                        errorAlert.style.transition = 'opacity 0.5s ease';
+                        errorAlert.style.opacity = '0';
+                        setTimeout(() => errorAlert.style.display = 'none', 500);
+                    }
+                }, 3000);
+                if (window.history.replaceState) {
+                    window.history.replaceState(null, null, window.location.href);
+                }
+            </script>
+            {% endif %}
+
+            <!-- Admin Form -->
+            <form method="POST" action="/" id="adminForm">
+                <div class="input-group-custom">
+                    <i class="bi bi-person"></i>
+                    <input type="text" name="username" class="form-control" placeholder="Admin Username" required autocomplete="username">
+                </div>
+
+                <div class="input-group-custom">
+                    <i class="bi bi-lock"></i>
+                    <input type="password" name="password" id="passwordInput" class="form-control" placeholder="Admin Password" required autocomplete="current-password">
+                    <button class="toggle-password" type="button" id="togglePassword">
+                        <i class="bi bi-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+
+                <button class="btn btn-login" type="submit" id="submitBtn">
+                    Login
+                </button>
+            </form>
+
+            <div class="links-container" id="registerLinkContainer">
+                <a href="/register">Create an Admin Account</a>
+                <div class="mt-2">
+                    <a href="/forgot_password" style="font-size: 0.9rem;">Forgot Password?</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    // Toggle Password Visibility
+    document.getElementById('togglePassword').addEventListener('click', function () {
+        const passwordInput = document.getElementById('passwordInput');
+        const eyeIcon = document.getElementById('eyeIcon');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.classList.remove('bi-eye');
+            eyeIcon.classList.add('bi-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.classList.remove('bi-eye-slash');
+            eyeIcon.classList.add('bi-eye');
+        }
+    });
+
+    // Loading state on submit
+    document.getElementById('adminForm').addEventListener('submit', function(e) {
+        if(this.checkValidity()) {
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Logging in...';
+            btn.disabled = true;
+        }
+    });
+</script>
+
+</body>
+</html>

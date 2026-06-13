@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">💳 Fee Payment</h2>
+
+<div class="card shadow-sm p-4">
+
+<form method="POST" action="/pay">
+
+    <!-- Student Selection -->
+    <div class="mb-3">
+        <label class="form-label">Select Student</label>
+        <select name="student_id" class="form-select" required>
+            <option value="" disabled selected>-- Select Student --</option>
+            {% for student in students %}
+            <option value="{{ student.id }}">{{ student.id }} - {{ student.name }} ({{ student.roll_no }})</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Payment Amount -->
+    <div class="mb-3">
+        <label class="form-label">Payment Amount</label>
+        <input type="number" name="amount" class="form-control" placeholder="Enter Amount" required>
+    </div>
+
+    <!-- Payment Date -->
+    <div class="mb-3">
+        <label class="form-label">Payment Date</label>
+        <input type="date" name="date" class="form-control">
+    </div>
+
+    <!-- Buttons -->
+    <div class="d-flex gap-2">
+        <button class="btn btn-success">💰 Pay Now</button>
+        <a href="/students" class="btn btn-secondary">⬅ Back</a>
+    </div>
+
+</form>
+
+</div>
+
+<!-- 🔥 OPTIONAL JS (Live Message) -->
+<script>
+document.querySelector("form").addEventListener("submit", function(){
+    alert("Payment Successful ✅");
+});
+</script>
+
+{% endblock %}

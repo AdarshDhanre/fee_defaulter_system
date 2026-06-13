@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">💰 Add Fee Details</h2>
+
+<div class="card p-4 shadow-sm">
+
+<form method="POST" action="/add_fee">
+
+    <!-- Student Selection -->
+    <div class="mb-3">
+        <label class="form-label">Select Student</label>
+        <select name="student_id" class="form-select" required>
+            <option value="" disabled selected>-- Select Student --</option>
+            {% for student in students %}
+            <option value="{{ student.id }}">{{ student.id }} - {{ student.name }} ({{ student.roll_no }})</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Total Fee -->
+    <div class="mb-3">
+        <label class="form-label">Total Fee</label>
+        <input type="number" name="total_fee" class="form-control" placeholder="Enter Total Fee" required>
+    </div>
+
+    <!-- Paid Amount -->
+    <div class="mb-3">
+        <label class="form-label">Paid Amount</label>
+        <input type="number" name="paid" class="form-control" placeholder="Enter Paid Amount" required>
+    </div>
+
+    <!-- Deadline -->
+    <div class="mb-3">
+        <label class="form-label">Deadline</label>
+        <input type="date" name="deadline" class="form-control" value="{{ last_deadline }}" required>
+    </div>
+
+    <!-- Buttons -->
+    <div class="d-flex gap-2">
+        <button class="btn btn-success">Save Fee</button>
+        <a href="/students" class="btn btn-secondary">Back</a>
+    </div>
+
+</form>
+
+</div>
+
+<script>
+    document.querySelector('select[name="student_id"]').addEventListener('change', function() {
+        const studentId = this.value;
+        const totalFeeInput = document.querySelector('input[name="total_fee"]');
+        
+        if (studentId) {
+            fetch(`/get_student_fee/${studentId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.total_fee !== undefined) {
+                        totalFeeInput.value = data.total_fee;
+                    }
+                })
+                .catch(error => console.error('Error fetching fee:', error));
+        }
+    });
+</script>
+
+{% endblock %}

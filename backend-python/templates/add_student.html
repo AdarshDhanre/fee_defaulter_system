@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .form-container {
+        max-width: 500px;
+        margin: 40px auto;
+        padding: 40px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        transform: translateY(30px);
+        opacity: 0;
+        animation: fadeInSlideUp 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    @keyframes fadeInSlideUp {
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .form-title {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #333;
+        font-weight: 600;
+        position: relative;
+    }
+
+    .form-title::after {
+        content: '';
+        width: 50px;
+        height: 3px;
+        background: #0d6efd;
+        display: block;
+        margin: 10px auto 0;
+        border-radius: 2px;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 12px 15px;
+        border: 1px solid #e0e0e0;
+        transition: all 0.3s ease;
+        background-color: #f8f9fa;
+    }
+
+    .form-control:focus {
+        background-color: #ffffff;
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #555;
+        font-size: 0.95rem;
+    }
+
+    .btn-submit {
+        border-radius: 8px;
+        padding: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+        border: none;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+    }
+</style>
+
+<div class="form-container">
+    <h3 class="form-title">{{ 'Edit Student' if student else 'Add New Student' }}</h3>
+    
+    <form method="POST">
+        <div class="mb-4">
+            <label class="form-label">Student Name</label>
+            <input type="text" class="form-control" name="name" placeholder="Enter full name" value="{{ student.name if student else '' }}" required>
+        </div>
+        
+        <div class="mb-4">
+            <label class="form-label">Roll Number</label>
+            <input type="text" class="form-control" name="roll" placeholder="Enter roll number" value="{{ student.roll_no if student else '' }}" required>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label">Course</label>
+            <select class="form-select" name="course" required>
+                <option value="" disabled {% if not student %}selected{% endif %}>Select Course</option>
+                {% set courses = ['B. Tech', 'M.Tech', 'MBA', 'MCA', 'BCCA', 'BSC', 'M.SC', 'Polytechnic'] %}
+                {% for c in courses %}
+                <option value="{{ c }}" {% if student and student.course == c %}selected{% endif %}>{{ c }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label">Year</label>
+            <select class="form-select" name="year" required>
+                <option value="" disabled {% if not student %}selected{% endif %}>Select Year</option>
+                <option value="FIRST" {% if student and student.year == 'FIRST' %}selected{% endif %}>FIRST</option>
+                <option value="SECOND" {% if student and student.year == 'SECOND' %}selected{% endif %}>SECOND</option>
+                <option value="THIRD" {% if student and student.year == 'THIRD' %}selected{% endif %}>THIRD</option>
+                <option value="FOURTH" {% if student and student.year == 'FOURTH' %}selected{% endif %}>FOURTH</option>
+                <option value="DSY" {% if student and student.year == 'DSY' %}selected{% endif %}>DSY</option>
+            </select>
+        </div>
+        
+        <div class="mb-4">
+            <label class="form-label">Branch/Course Details</label>
+            <input type="text" class="form-control" name="branch" placeholder="e.g. AI/CSE/CYS/ME/CE/IT/ETC/EE/DSE" value="{{ student.branch if student else '' }}" required>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label">Category</label>
+            <select class="form-select" name="category" required>
+                <option value="" disabled {% if not student %}selected{% endif %}>Select Category</option>
+                {% set categories = ['Open', 'OBC', 'VJ/NT', 'SC/ST', 'OMS', 'Mgmt.Quota'] %}
+                {% for cat in categories %}
+                <option value="{{ cat }}" {% if student and student.category == cat %}selected{% endif %}>{{ cat }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="mb-4">
+            <label class="form-label">Email Address</label>
+            <input type="email" class="form-control" name="email" placeholder="student@example.com" value="{{ student.email if student else '' }}" required>
+        </div>
+        
+        <div class="d-grid gap-2 mt-5">
+            <button type="submit" class="btn btn-primary btn-submit">
+                Save Student
+            </button>
+            <a href="/students" class="btn btn-light mt-2 text-muted fw-bold">Cancel</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

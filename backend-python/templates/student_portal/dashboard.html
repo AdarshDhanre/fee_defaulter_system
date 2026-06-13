@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal - Fee System</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #f4f7fe;
+            --panel-bg: #ffffff;
+            --panel-border: rgba(0, 0, 0, 0.05);
+            --primary: #4318FF;
+            --primary-light: #F4F7FE;
+            --success: #05CD99;
+            --danger: #EE5D50;
+            --text-main: #2B3674;
+            --text-muted: #A3AED0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        /* Stunning Light Sidebar */
+        .sidebar {
+            width: 280px;
+            background: #ffffff;
+            border-right: 1px solid var(--panel-border);
+            display: flex;
+            flex-direction: column;
+            padding: 2.5rem 1.5rem;
+            box-shadow: 14px 17px 40px 4px rgba(112, 144, 176, 0.08);
+            z-index: 1000;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Header and Footer are fixed, middle scrolls */
+        }
+
+        .sidebar-brand {
+            font-weight: 800;
+            font-size: 1.8rem;
+            color: var(--text-main);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-brand i {
+            color: var(--primary);
+            font-size: 2.2rem;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 5px;
+        }
+        
+        /* Custom scrollbar for sidebar nav */
+        .sidebar-nav::-webkit-scrollbar { width: 4px; }
+        .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-nav::-webkit-scrollbar-thumb { background: #E0E5F2; border-radius: 10px; }
+
+        .nav-item {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            font-weight: 600;
+            padding: 14px 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-item i {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active, .nav-item:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-left: 4px solid var(--primary);
+        }
+
+        .nav-item.active i, .nav-item:hover i {
+            color: var(--primary);
+        }
+
+        .nav-item.danger-link { margin-top: auto; }
+        .nav-item.danger-link:hover {
+            background: #FFF5F5;
+            color: var(--danger);
+            border-left-color: var(--danger);
+        }
+        .nav-item.danger-link:hover i { color: var(--danger); }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            height: 100vh;
+            overflow-y: auto;
+            padding: 3rem 4rem;
+        }
+
+        /* Premium Panels */
+        .glass-panel {
+            background: var(--panel-bg);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            box-shadow: 14px 17px 40px 4px rgba(112, 144, 176, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .glass-panel:hover {
+            box-shadow: 14px 17px 40px 4px rgba(112, 144, 176, 0.15);
+        }
+
+        /* Profile Area */
+        .profile-avatar {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #868CFF, #4318FF);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; font-weight: bold; color: white;
+            margin: 0 auto 15px;
+            box-shadow: 0 10px 20px rgba(67, 24, 255, 0.2);
+        }
+
+        /* Metric Cards */
+        .metric-widget {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1.8rem;
+            border-radius: 1.2rem;
+            background: #ffffff;
+            box-shadow: 14px 17px 40px 4px rgba(112, 144, 176, 0.08);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .metric-widget:hover {
+            transform: translateY(-5px);
+        }
+
+        .metric-icon {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+        }
+
+        .icon-blue { background: #F4F7FE; color: var(--primary); }
+        .icon-green { background: #E6FAF5; color: var(--success); }
+        .icon-red { background: #FFEDEC; color: var(--danger); }
+
+        .metric-details p { margin: 0; font-size: 0.95rem; color: var(--text-muted); font-weight: 500; }
+        .metric-details h3 { margin: 0; font-size: 2.2rem; font-weight: 800; color: var(--text-main); }
+
+        /* Payment Form Area */
+        .payment-box {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .form-label {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .input-group-text {
+            background: #F4F7FE;
+            border: 1px solid #E0E5F2;
+            color: var(--text-main);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .form-control-custom {
+            background: #F4F7FE;
+            border: 1px solid #E0E5F2;
+            color: var(--text-main);
+            border-radius: 10px;
+            padding: 15px 20px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .form-control-custom:focus {
+            background: #ffffff;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(67, 24, 255, 0.1);
+            outline: none;
+            color: var(--text-main);
+        }
+
+        .btn-gradient {
+            background: var(--primary);
+            border: none;
+            color: white;
+            font-weight: 700;
+            padding: 16px;
+            border-radius: 16px;
+            transition: all 0.3s;
+            box-shadow: 0 10px 20px rgba(67, 24, 255, 0.2);
+            font-size: 1.2rem;
+        }
+
+        .btn-gradient:hover {
+            background: #3311DB;
+            transform: translateY(-2px);
+            box-shadow: 0 14px 25px rgba(67, 24, 255, 0.3);
+            color: white;
+        }
+
+        .dues-cleared {
+            background: #E6FAF5;
+            border-radius: 1.2rem;
+            padding: 4rem 2rem;
+            text-align: center;
+            color: var(--success);
+        }
+
+        /* Transactions Table */
+        .table-custom { margin: 0; }
+        .table-custom th { 
+            color: var(--text-muted); 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            font-size: 0.85rem; 
+            letter-spacing: 0.5px; 
+            padding: 20px 15px; 
+            border-bottom: 2px solid #F4F7FE;
+        }
+        .table-custom td { 
+            padding: 20px 15px; 
+            vertical-align: middle; 
+            font-size: 1.1rem; 
+            color: var(--text-main);
+            border-bottom: 1px solid #F4F7FE;
+        }
+        .table-custom tr:last-child td { border-bottom: none; }
+
+        .btn-receipt {
+            background: #F4F7FE;
+            color: var(--primary);
+            border-radius: 10px;
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .btn-receipt:hover {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(67, 24, 255, 0.2);
+        }
+
+        /* Scrollbar styles for modern look */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Challan Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 5px 14px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .status-pending  { background: #FFF7ED; color: #C2410C; border: 1px solid #FED7AA; }
+        .status-approved { background: #ECFDF5; color: #047857; border: 1px solid #6EE7B7; }
+        .status-rejected { background: #FEF2F2; color: #B91C1C; border: 1px solid #FECACA; }
+
+        .challan-card {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 1rem;
+            padding: 1.5rem 1.8rem;
+            transition: box-shadow 0.3s;
+        }
+        .challan-card:hover { box-shadow: 0 4px 20px rgba(67,24,255,0.07); }
+        .challan-card.approved-card { border-left: 4px solid #10b981; }
+        .challan-card.rejected-card { border-left: 4px solid #EE5D50; }
+        .challan-card.pending-card  { border-left: 4px solid #F59E0B; }
+
+        /* Animations */
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .content-section {
+            display: none;
+            animation: fadeUp 0.5s ease-out forwards;
+        }
+        .content-section.active {
+            display: block;
+        }
+
+        /* AI Chatbot Styles */
+        .chatbot-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 65px;
+            height: 65px;
+            background: linear-gradient(135deg, #868CFF, #4318FF);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            box-shadow: 0 10px 25px rgba(67, 24, 255, 0.4);
+            cursor: pointer;
+            z-index: 9999;
+            transition: all 0.3s;
+        }
+        .chatbot-btn:hover {
+            transform: scale(1.1);
+        }
+        .chat-window {
+            position: fixed;
+            bottom: 110px;
+            right: 30px;
+            width: 350px;
+            height: 450px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            display: none;
+            flex-direction: column;
+            z-index: 9999;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
+            animation: fadeUp 0.3s ease-out;
+        }
+        .chat-header {
+            background: linear-gradient(135deg, #868CFF, #4318FF);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+        .chat-body {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: #f8fafc;
+        }
+        .chat-msg {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+        .msg-bot {
+            background: white;
+            color: var(--text-main);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .msg-user {
+            background: var(--primary);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+            box-shadow: 0 2px 5px rgba(67, 24, 255, 0.2);
+        }
+        .chat-input-area {
+            display: flex;
+            padding: 10px;
+            background: white;
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+        .chat-input {
+            flex-grow: 1;
+            border: none;
+            background: #f1f5f9;
+            padding: 10px 15px;
+            border-radius: 20px;
+            outline: none;
+        }
+        .chat-send-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        
+    </style>
+</head>
+<body>
+
+<!-- Sidebar Navigation -->
+<aside class="sidebar">
+    <a href="#" class="sidebar-brand">
+        <i class="bi bi-mortarboard-fill"></i>
+        Student Portal
+    </a>
+
+    <!-- Profile Area in Sidebar -->
+    <div class="text-center mb-3 pb-3" style="border-bottom: 1px solid #F4F7FE;">
+        <div class="profile-avatar">
+            {{ student.name[0] }}
+        </div>
+        <h5 class="fw-bold mb-1" style="color: var(--text-main);">{{ student.name }}</h5>
+        <span class="badge" style="background: var(--primary-light); color: var(--primary); padding: 6px 12px; font-size: 0.85rem; border-radius: 8px;">
+            Roll: {{ student.roll_no }}
+        </span>
+    </div>
+
+    <!-- Scrollable Nav Area -->
+    <nav class="sidebar-nav">
+        <a class="nav-item active" onclick="switchTab('overview', this)">
+            <i class="bi bi-grid-1x2-fill"></i>
+            Overview
+        </a>
+        <a class="nav-item" onclick="switchTab('profile', this)">
+            <i class="bi bi-person-lines-fill"></i>
+            My Profile
+        </a>
+        <a class="nav-item" onclick="switchTab('make-payment', this)">
+            <i class="bi bi-credit-card-2-front-fill"></i>
+            Pay Online
+        </a>
+        <a class="nav-item" onclick="switchTab('upload-challan', this)">
+            <i class="bi bi-cloud-arrow-up-fill"></i>
+            Upload Challan
+        </a>
+        <a class="nav-item" onclick="switchTab('my-requests', this)" id="nav-my-requests">
+            <i class="bi bi-clock-history"></i>
+            My Requests
+            {% set pending_count = offline_receipts | selectattr('status', 'equalto', 'Pending') | list | length %}
+            {% if pending_count > 0 %}
+            <span style="margin-left:auto; background:#F59E0B; color:white; font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:10px;">{{ pending_count }}</span>
+            {% endif %}
+        </a>
+        <a class="nav-item" onclick="switchTab('history', this)">
+            <i class="bi bi-receipt"></i>
+            Receipts
+        </a>
+    </nav>
+
+    <!-- Fixed Bottom Area -->
+    <div style="border-top: 1px solid #F4F7FE; padding-top: 1rem; margin-top: 1rem;">
+        <a href="/logout" class="nav-item danger-link" style="margin: 0;">
+            <i class="bi bi-box-arrow-right"></i>
+            Logout
+        </a>
+    </div>
+</aside>
+
+<div class="main-content">
+    
+    <!-- SECTION: MY PROFILE -->
+    <div id="profile" class="content-section">
+        <div class="mb-5">
+            <h2 class="fw-bold m-0" style="font-size: 2.2rem; color: var(--text-main);">My Profile</h2>
+            <p class="mt-2 mb-0" style="font-size: 1.1rem; color: var(--text-muted);">View your personal and academic details.</p>
+        </div>
+
+        <div class="glass-panel" style="max-width: 800px;">
+            <div class="row align-items-center">
+                <!-- Left side: Big Avatar -->
+                <div class="col-md-4 text-center border-end" style="border-color: #F4F7FE !important;">
+                    <div class="profile-avatar mx-auto mb-3" style="width: 120px; height: 120px; font-size: 4rem;">
+                        {{ student.name[0] }}
+                    </div>
+                    <h3 class="fw-bold" style="color: var(--text-main);">{{ student.name }}</h3>
+                    <span class="badge mb-2" style="background: var(--primary-light); color: var(--primary); padding: 8px 15px; font-size: 1rem; border-radius: 8px;">
+                        {{ student.roll_no }}
+                    </span>
+                </div>
+                
+                <!-- Right side: Details Grid -->
+                <div class="col-md-8 ps-md-5 mt-4 mt-md-0">
+                    <div class="row g-4">
+                        <div class="col-sm-6">
+                            <p class="mb-1" style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Email Address</p>
+                            <h5 class="fw-bold" style="color: var(--text-main); font-size: 1.1rem;"><i class="bi bi-envelope-fill me-2" style="color: var(--primary);"></i>{{ student.email }}</h5>
+                        </div>
+                        <div class="col-sm-6">
+                            <p class="mb-1" style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Course</p>
+                            <h5 class="fw-bold" style="color: var(--text-main); font-size: 1.1rem;"><i class="bi bi-book-fill me-2" style="color: var(--primary);"></i>{{ student.course }}</h5>
+                        </div>
+                        <div class="col-sm-6">
+                            <p class="mb-1" style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Branch</p>
+                            <h5 class="fw-bold" style="color: var(--text-main); font-size: 1.1rem;"><i class="bi bi-diagram-3-fill me-2" style="color: var(--primary);"></i>{{ student.branch }}</h5>
+                        </div>
+                        <div class="col-sm-6">
+                            <p class="mb-1" style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Academic Year</p>
+                            <h5 class="fw-bold" style="color: var(--text-main); font-size: 1.1rem;"><i class="bi bi-calendar-event-fill me-2" style="color: var(--primary);"></i>{{ student.year }}</h5>
+                        </div>
+                        <div class="col-sm-6">
+                            <p class="mb-1" style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Admission Category</p>
+                            <h5 class="fw-bold" style="color: var(--text-main); font-size: 1.1rem;"><i class="bi bi-tags-fill me-2" style="color: var(--primary);"></i>{{ student.category }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION: OVERVIEW -->
+    <div id="overview" class="content-section active">
+        <!-- Welcome Header -->
+        <div class="d-flex justify-content-between align-items-end mb-5">
+            <div>
+                <h2 class="fw-bold m-0" style="font-size: 2.2rem; color: var(--text-main);">Dashboard <span style="font-size: 1.5rem;">👋</span></h2>
+                <p class="mt-2 mb-0" style="font-size: 1.1rem; color: var(--text-muted);">
+                    <i class="bi bi-book me-1"></i> Course: <strong>{{ student.course }}</strong> &nbsp;|&nbsp; 
+                    <i class="bi bi-building me-1"></i> Branch: <strong>{{ student.branch }}</strong>
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="metric-widget">
+                    <div class="metric-icon icon-blue"><i class="bi bi-wallet2"></i></div>
+                    <div class="metric-details">
+                        <p>Total Course Fee</p>
+                        <h3>₹{{ total_fee }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="metric-widget">
+                    <div class="metric-icon icon-green"><i class="bi bi-check-circle-fill"></i></div>
+                    <div class="metric-details">
+                        <p>Amount Paid</p>
+                        <h3>₹{{ paid_fee }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="metric-widget">
+                    <div class="metric-icon icon-red" style="background: #FFF5F5; color: #EE5D50;"><i class="bi bi-clock-history"></i></div>
+                    <div class="metric-details">
+                        <p>Late Fine (₹50/day)</p>
+                        <h3>₹{{ total_fine }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="metric-widget" style="background: linear-gradient(135deg, #4318FF, #868CFF); color: white;">
+                    <div class="metric-icon" style="background: rgba(255,255,255,0.2); color: white;"><i class="bi bi-currency-rupee"></i></div>
+                    <div class="metric-details">
+                        <p style="color: rgba(255,255,255,0.8);">Total Payable Amount</p>
+                        <h3 style="color: white;">₹{{ total_payable }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION: MAKE PAYMENT -->
+    <div id="make-payment" class="content-section">
+        <div class="mb-5 text-center">
+            <h2 class="fw-bold m-0" style="font-size: 2.5rem; color: var(--text-main);">Secure Payment</h2>
+            <p class="mt-2 mb-0" style="font-size: 1.1rem; color: var(--text-muted);">Pay your pending college fees instantly.</p>
+        </div>
+
+        <div class="glass-panel" style="max-width: 650px; margin: 0 auto;">
+            <div class="payment-box">
+                {% if total_payable > 0 %}
+                <div class="text-center mb-5">
+                    <p class="mb-2" style="font-size: 1.1rem; color: var(--text-muted); font-weight: 600;">Total Amount (Including Fine)</p>
+                    <h2 class="fw-bold" style="font-size: 3.5rem; color: var(--danger);">₹{{ total_payable }}</h2>
+                    {% if total_fine > 0 %}
+                    <span class="badge bg-danger rounded-pill">Includes ₹{{ total_fine }} Late Fine</span>
+                    {% endif %}
+                </div>
+
+                <form id="paymentForm">
+                    <div class="mb-4">
+                        <label class="form-label mb-2" style="font-size: 1.1rem;">Enter Amount to Pay</label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text border-end-0">₹</span>
+                            <input type="number" id="payAmount" name="amount" class="form-control form-control-custom border-start-0" max="{{ total_payable }}" required placeholder="0.00" value="{{ total_payable }}">
+                        </div>
+                        <small class="mt-2 d-block" style="color: var(--text-muted);"><i class="bi bi-info-circle"></i> You can pay partial or full amount (including fine).</small>
+                    </div>
+                    
+                    <button type="button" id="rzp-button1" class="btn btn-gradient w-100 mt-4">
+                        Pay Securely Now <i class="bi bi-arrow-right ms-2"></i>
+                    </button>
+                </form>
+
+                <!-- Hidden form to submit to server after Razorpay success -->
+                <form id="verifyPaymentForm" action="/student/verify_payment" method="POST" style="display: none;">
+                    <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+                    <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+                    <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+                </form>
+
+                <div class="mt-4 text-center" style="font-size: 0.95rem; color: var(--text-muted); font-weight: 500;">
+                    <i class="bi bi-shield-check" style="color: var(--success); font-size: 1.2rem; vertical-align: middle;"></i> 256-bit Bank Grade Security
+                </div>
+
+                {% else %}
+                <div class="dues-cleared">
+                    <div class="metric-icon icon-green mx-auto mb-4" style="width: 100px; height: 100px; font-size: 3rem;">
+                        <i class="bi bi-check2-all"></i>
+                    </div>
+                    <h2 class="fw-bold mb-3" style="color: var(--text-main);">Outstanding!</h2>
+                    <p class="m-0" style="font-size: 1.2rem; color: var(--text-muted);">All your dues are cleared.<br>You have no pending payments at this time.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION: UPLOAD CHALLAN (OCR) -->
+    <div id="upload-challan" class="content-section">
+        <div class="mb-5 text-center">
+            <h2 class="fw-bold m-0" style="font-size: 2.5rem; color: var(--text-main);">Upload Bank Challan</h2>
+            <p class="mt-2 mb-0" style="font-size: 1.1rem; color: var(--text-muted);">Did you pay via Bank DD/RTGS? Upload your receipt for AI Auto-Verification.</p>
+        </div>
+
+        <div class="glass-panel" style="max-width: 650px; margin: 0 auto; text-align: center;">
+            <div id="upload-box" style="border: 2px dashed #A3AED0; border-radius: 1.5rem; padding: 4rem 2rem; background: #f8fafc; cursor: pointer; transition: all 0.3s;" onclick="document.getElementById('receiptInput').click()">
+                <i class="bi bi-cloud-arrow-up" style="font-size: 4rem; color: var(--primary);"></i>
+                <h4 class="mt-3 fw-bold" style="color: var(--text-main);">Click to Upload Receipt</h4>
+                <p style="color: var(--text-muted);">JPEG, PNG, or JPG only</p>
+                <input type="file" id="receiptInput" accept="image/*" style="display: none;" onchange="handleFileUpload(this)">
+            </div>
+            
+            <div id="upload-loader" style="display: none; padding: 3rem;">
+                <div class="spinner-border" style="color: var(--primary); width: 3rem; height: 3rem;" role="status"></div>
+                <h5 class="mt-3 fw-bold" style="color: var(--text-main);">AI is Scanning your Receipt...</h5>
+                <p style="color: var(--text-muted);">Extracting UTR and Amount via Gemini Vision</p>
+            </div>
+            
+            <div id="upload-success" style="display: none; padding: 2rem; background: #E6FAF5; border-radius: 1.5rem; border: 1px solid #05CD99; margin-top: 2rem;">
+                <i class="bi bi-check-circle-fill" style="font-size: 3rem; color: #05CD99;"></i>
+                <h4 class="mt-3 fw-bold" style="color: var(--text-main);">Receipt Scanned Successfully!</h4>
+                <div class="mt-3 text-start" style="background: white; padding: 1.5rem; border-radius: 1rem;">
+                    <p class="mb-2"><strong>Transaction ID (UTR):</strong> <span id="ocr-utr" style="color: var(--primary);"></span></p>
+                    <p class="mb-2"><strong>Amount Paid:</strong> ₹<span id="ocr-amount" style="color: var(--success);"></span></p>
+                    <p class="mb-0"><strong>Date:</strong> <span id="ocr-date"></span></p>
+                </div>
+                <p class="mt-3" style="color: var(--text-muted); font-size: 0.9rem;">Your receipt has been sent to the Admin for final approval.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION: PAYMENT HISTORY -->
+    <div id="history" class="content-section">
+
+        <div class="mb-5">
+            <h2 class="fw-bold m-0" style="font-size: 2.2rem; color: var(--text-main);">Payment History</h2>
+            <p class="mt-2 mb-0" style="font-size: 1.1rem; color: var(--text-muted);">View past transactions and download official receipts.</p>
+        </div>
+
+        <div class="glass-panel">
+            {% if payments %}
+            <div class="table-responsive">
+                <table class="table table-custom table-borderless">
+                    <thead>
+                        <tr>
+                            <th>Transaction Date</th>
+                            <th>Amount Paid</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pay in payments %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="metric-icon icon-blue" style="width: 45px; height: 45px; font-size: 1.2rem;">
+                                        <i class="bi bi-calendar-event"></i>
+                                    </div>
+                                    <span class="fw-bold">{{ pay.date }}</span>
+                                </div>
+                            </td>
+                            <td class="fw-bold" style="font-size: 1.3rem; color: var(--success);">
+                                + ₹{{ pay.amount }}
+                            </td>
+                            <td class="text-end">
+                                <a href="/student/receipt/{{ pay.id }}" class="btn-receipt" target="_blank">
+                                    Download PDF <i class="bi bi-cloud-download"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <div class="metric-icon mx-auto mb-3" style="width: 80px; height: 80px; background: #F4F7FE; color: var(--text-muted); font-size: 2rem;">
+                    <i class="bi bi-inbox"></i>
+                </div>
+                <h4 class="fw-bold" style="color: var(--text-main);">No Transactions Yet</h4>
+                <p class="mt-2" style="color: var(--text-muted);">You haven't made any payments so far.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- SECTION: MY CHALLAN REQUESTS -->
+    <div id="my-requests" class="content-section">
+        <div class="mb-5">
+            <h2 class="fw-bold m-0" style="font-size: 2.2rem; color: var(--text-main);">My Challan Requests</h2>
+            <p class="mt-2 mb-0" style="font-size: 1.1rem; color: var(--text-muted);">Track the status of your offline challan submissions.</p>
+        </div>
+
+        {% if offline_receipts %}
+        <div class="d-flex flex-column gap-3">
+            {% for r in offline_receipts %}
+            <div class="challan-card
+                {% if r.status == 'Approved' %}approved-card
+                {% elif r.status == 'Rejected' %}rejected-card
+                {% else %}pending-card{% endif %}">
+
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            {% if r.status == 'Approved' %}
+                                <span class="status-badge status-approved"><i class="bi bi-check-circle-fill"></i> Approved</span>
+                            {% elif r.status == 'Rejected' %}
+                                <span class="status-badge status-rejected"><i class="bi bi-x-circle-fill"></i> Rejected</span>
+                            {% else %}
+                                <span class="status-badge status-pending"><i class="bi bi-hourglass-split"></i> Pending Review</span>
+                            {% endif %}
+                            <span style="color: var(--text-muted); font-size: 0.85rem;">Receipt #{{ r.id }}</span>
+                        </div>
+
+                        <div class="row g-3 mt-1">
+                            <div class="col-sm-4">
+                                <p class="mb-0" style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">UTR / Txn ID</p>
+                                <p class="mb-0 fw-bold" style="color: var(--text-main); font-size: 1rem;">{{ r.extracted_utr or 'N/A' }}</p>
+                            </div>
+                            <div class="col-sm-4">
+                                <p class="mb-0" style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Amount</p>
+                                <p class="mb-0 fw-bold" style="color: var(--success); font-size: 1rem;">₹{{ r.extracted_amount or 'N/A' }}</p>
+                            </div>
+                            <div class="col-sm-4">
+                                <p class="mb-0" style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Submitted On</p>
+                                <p class="mb-0 fw-bold" style="color: var(--text-main); font-size: 1rem;">{{ r.upload_date.strftime('%d %b %Y') if r.upload_date else 'N/A' }}</p>
+                            </div>
+                        </div>
+
+                        {% if r.status == 'Rejected' %}
+                        <div class="mt-3 p-3" style="background: #FEF2F2; border-radius: 0.8rem; font-size: 0.9rem; color: #B91C1C;">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Your challan was rejected. Please re-upload a clear image or visit the accounts office.
+                        </div>
+                        {% elif r.status == 'Pending' %}
+                        <div class="mt-3 p-3" style="background: #FFFBEB; border-radius: 0.8rem; font-size: 0.9rem; color: #92400E;">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Your challan is under review. You will receive an email once it is verified.
+                        </div>
+                        {% else %}
+                        <div class="mt-3 p-3" style="background: #ECFDF5; border-radius: 0.8rem; font-size: 0.9rem; color: #047857;">
+                            <i class="bi bi-check-circle me-1"></i>
+                            Your payment has been verified and added to your fee record.
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Challan Image Preview -->
+                    {% if r.file_path %}
+                    <a href="{{ r.file_path }}" target="_blank"
+                       style="flex-shrink: 0; border-radius: 0.8rem; overflow: hidden; display: block; border: 2px solid #E2E8F0;">
+                        <img src="{{ r.file_path }}" alt="Receipt"
+                             style="width: 80px; height: 80px; object-fit: cover; display: block;"
+                             onerror="this.parentElement.innerHTML='<div style=&quot;width:80px;height:80px;background:#F4F7FE;display:flex;align-items:center;justify-content:center;border-radius:0.8rem;&quot;><i class=&quot;bi bi-file-image&quot; style=&quot;font-size:2rem;color:#A3AED0;&quot;></i></div>'">
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <div class="glass-panel text-center py-5">
+            <div class="metric-icon mx-auto mb-3" style="width: 80px; height: 80px; background: #F4F7FE; color: var(--text-muted); font-size: 2rem;">
+                <i class="bi bi-inbox"></i>
+            </div>
+            <h4 class="fw-bold" style="color: var(--text-main);">No Challan Submissions Yet</h4>
+            <p style="color: var(--text-muted);">You haven't uploaded any offline challans. Go to <strong>Upload Challan</strong> to submit one.</p>
+            <button class="btn btn-gradient mt-2" onclick="switchTab('upload-challan', document.querySelector('[onclick*=upload-challan]'))">
+                <i class="bi bi-cloud-arrow-up-fill me-2"></i> Upload Now
+            </button>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- AI Chatbot UI -->
+<div class="chatbot-btn" onclick="toggleChat()">
+    <i class="bi bi-chat-dots-fill"></i>
+</div>
+
+<div class="chat-window" id="chatWindow">
+    <div class="chat-header">
+        <div><i class="bi bi-robot me-2"></i> EduAI Assistant</div>
+        <i class="bi bi-x-lg" style="cursor: pointer;" onclick="toggleChat()"></i>
+    </div>
+    <div class="chat-body" id="chatBody">
+        <div class="chat-msg msg-bot">
+            Hi {{ student.name.split()[0] }}! 👋 I am your AI Assistant. You can ask me things like: <br>
+            <i>"What is my pending fee?"</i>
+        </div>
+    </div>
+    <div class="chat-input-area">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." onkeypress="handleChatEnter(event)">
+        <button class="chat-send-btn" onclick="sendMessage()"><i class="bi bi-send-fill"></i></button>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    // Handle tab switching like a Single Page Application (SPA)
+    function switchTab(tabId, element) {
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        element.classList.add('active');
+
+        const sections = document.querySelectorAll('.content-section');
+        sections.forEach(section => {
+            section.classList.remove('active');
+        });
+
+        const targetSection = document.getElementById(tabId);
+        targetSection.classList.add('active');
+        document.querySelector('.main-content').scrollTop = 0;
+    }
+
+    // Razorpay Integration
+    document.getElementById('rzp-button1')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        const amount = document.getElementById('payAmount').value;
+        const btn = document.getElementById('rzp-button1');
+        
+        if(amount <= 0) {
+            alert("Please enter a valid amount.");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+
+        fetch('/student/create_order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `amount=${amount}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.error) {
+                alert(data.error);
+                btn.disabled = false;
+                btn.innerHTML = 'Pay Securely Now <i class="bi bi-arrow-right ms-2"></i>';
+                return;
+            }
+
+            var options = {
+                "key": "{{ razorpay_key_id }}", 
+                "amount": data.amount, 
+                "currency": data.currency,
+                "name": "EduPortal Fee System",
+                "description": "Fee Payment",
+                "image": "https://cdn-icons-png.flaticon.com/512/3225/3225068.png",
+                "order_id": data.order_id, 
+                "handler": function (response){
+                    document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+                    document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+                    document.getElementById('razorpay_signature').value = response.razorpay_signature;
+                    document.getElementById('verifyPaymentForm').submit();
+                },
+                "prefill": {
+                    "name": data.name,
+                    "email": data.email,
+                    "contact": data.contact
+                },
+                "theme": {
+                    "color": "#4318FF"
+                },
+                "modal": {
+                    "ondismiss": function() {
+                        btn.disabled = false;
+                        btn.innerHTML = 'Pay Securely Now <i class="bi bi-arrow-right ms-2"></i>';
+                    }
+                }
+            };
+            var rzp1 = new Razorpay(options);
+            rzp1.open();
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Payment initiation failed. Check your internet connection.");
+            btn.disabled = false;
+            btn.innerHTML = 'Pay Securely Now <i class="bi bi-arrow-right ms-2"></i>';
+        });
+    });
+
+    // Handle File Upload and OCR
+    function handleFileUpload(input) {
+        if (!input.files || input.files.length === 0) return;
+        
+        const file = input.files[0];
+        const formData = new FormData();
+        formData.append('receipt', file);
+        
+        // UI Updates
+        document.getElementById('upload-box').style.display = 'none';
+        document.getElementById('upload-loader').style.display = 'block';
+        
+        fetch('/student/upload_receipt', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('upload-loader').style.display = 'none';
+            
+            if (data.error) {
+                alert(data.error);
+                document.getElementById('upload-box').style.display = 'block';
+            } else {
+                // Success
+                document.getElementById('upload-success').style.display = 'block';
+                document.getElementById('ocr-utr').innerText = data.data.transaction_id || "Not Found";
+                document.getElementById('ocr-amount').innerText = data.data.amount || "Not Found";
+                document.getElementById('ocr-date').innerText = data.data.date || "Not Found";
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Upload failed. Please try again.");
+            document.getElementById('upload-loader').style.display = 'none';
+            document.getElementById('upload-box').style.display = 'block';
+        });
+    }
+
+    // Chatbot JS
+    function toggleChat() {
+        const chatWindow = document.getElementById('chatWindow');
+        chatWindow.style.display = chatWindow.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function handleChatEnter(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    }
+
+    function sendMessage() {
+        const inputField = document.getElementById('chatInput');
+        const message = inputField.value.trim();
+        if (!message) return;
+
+        // Add user message
+        appendMessage(message, 'msg-user');
+        inputField.value = '';
+
+        // Show typing indicator
+        const typingId = 'typing-' + Date.now();
+        appendMessage('...', 'msg-bot', typingId);
+
+        // Call backend API
+        fetch('/student/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Remove typing indicator
+            document.getElementById(typingId).remove();
+            // Add bot reply
+            appendMessage(data.reply, 'msg-bot');
+        })
+        .catch(err => {
+            document.getElementById(typingId).remove();
+            appendMessage('Sorry, I am having trouble connecting right now.', 'msg-bot');
+        });
+    }
+
+    function appendMessage(text, className, id = '') {
+        const chatBody = document.getElementById('chatBody');
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'chat-msg ' + className;
+        if (id) msgDiv.id = id;
+        msgDiv.innerHTML = text;
+        chatBody.appendChild(msgDiv);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">📊 Reports Dashboard</h2>
+
+<!-- 🔥 SUMMARY CARDS -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white p-3 shadow-sm">
+            <h6>Total Students</h6>
+            <h3>{{ summary.total_students }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card bg-success text-white p-3 shadow-sm">
+            <h6>Paid</h6>
+            <h3>{{ summary.paid }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark p-3 shadow-sm">
+            <h6>Partial</h6>
+            <h3>{{ summary.partial }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card bg-danger text-white p-3 shadow-sm">
+            <h6>Overdue</h6>
+            <h3>{{ summary.overdue }}</h3>
+        </div>
+    </div>
+</div>
+
+<!-- 🔥 ACTION BUTTONS -->
+<div class="mb-4">
+    <a href="/download_report" class="btn btn-success me-2">
+        📥 Download CSV Report
+    </a>
+
+    <a href="/send_alerts" class="btn btn-danger me-2">
+        🔔 Send Alerts to Defaulters
+    </a>
+    
+    <a href="/send_partial_alerts" class="btn btn-warning me-2 text-dark">
+        🔔 Send Partial Fee Alerts
+    </a>
+
+    <a href="/defaulters" class="btn btn-warning">
+        🚨 View Defaulters
+    </a>
+</div>
+
+<!-- 🔥 TABLE (OPTIONAL FULL REPORT) -->
+<div class="card p-3 shadow-sm">
+    <h5>📋 Full Report</h5>
+
+    <table class="table table-bordered table-hover mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Student ID</th>
+                <th>Total Fee</th>
+                <th>Paid</th>
+                <th>Due</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for r in report %}
+            <tr>
+                <td>{{ r.student_id }}</td>
+                <td>₹{{ r.total_fee }}</td>
+                <td>₹{{ r.paid }}</td>
+                <td>₹{{ r.due }}</td>
+
+                <td>
+                    {% if r.status == "Overdue" %}
+                        <span class="badge bg-danger">Overdue</span>
+                    {% elif r.status == "Partial" %}
+                        <span class="badge bg-warning text-dark">Partial</span>
+                    {% else %}
+                        <span class="badge bg-success">Paid</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

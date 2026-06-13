@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .alert-card {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        background: #ffffff;
+        transform: translateY(30px);
+        opacity: 0;
+        animation: slideUpFade 0.6s ease-out forwards;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    @keyframes slideUpFade {
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .icon-container {
+        font-size: 80px;
+        margin-bottom: 20px;
+        animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s forwards;
+        transform: scale(0);
+        display: inline-block;
+    }
+    
+    @keyframes popIn {
+        to {
+            transform: scale(1);
+        }
+    }
+
+    .success-theme .icon-container { color: #28a745; text-shadow: 0 4px 15px rgba(40, 167, 69, 0.3); }
+    .error-theme .icon-container { color: #dc3545; text-shadow: 0 4px 15px rgba(220, 53, 69, 0.3); }
+    .info-theme .icon-container { color: #17a2b8; text-shadow: 0 4px 15px rgba(23, 162, 184, 0.3); }
+    
+    .message-text {
+        font-size: 20px;
+        font-weight: 500;
+        color: #444;
+        margin-bottom: 35px;
+        line-height: 1.5;
+    }
+
+    .btn-animated {
+        transition: all 0.3s ease;
+    }
+    
+    .btn-animated:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+</style>
+
+{% set theme = 'info-theme' %}
+{% set icon = 'ℹ️' %}
+
+{% if '❌' in message %}
+    {% set theme = 'error-theme' %}
+    {% set icon = '❌' %}
+{% elif '✅' in message or 'SUCCESS' in message %}
+    {% set theme = 'success-theme' %}
+    {% set icon = '✅' %}
+{% endif %}
+
+<div class="alert-card {{ theme }}">
+    <div class="icon-container">
+        {{ icon }}
+    </div>
+    
+    <h3 class="mb-3 font-weight-bold">Alert Status</h3>
+    
+    <div class="message-text">
+        {{ message|replace('✅', '')|replace('❌', '')|replace('📧', '') }}
+    </div>
+    
+    <div class="d-flex justify-content-center gap-3">
+        <a href="/defaulters" class="btn btn-primary px-4 py-2 btn-animated">Back to Defaulters</a>
+        <a href="/dashboard" class="btn btn-outline-secondary px-4 py-2 btn-animated">Go to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

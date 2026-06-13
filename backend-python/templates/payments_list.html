@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>💳 Payment History</h2>
+    <a href="/payment" class="btn btn-primary">➕ Make Payment</a>
+</div>
+
+<table class="table table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>Student (Roll No)</th>
+            <th>Amount</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for p in payments %}
+        <tr>
+            <td>
+                <strong>{{ p.student.name if p.student else 'Unknown' }}</strong><br>
+                <small class="text-secondary">({{ p.student.roll_no if p.student else p.student_id }})</small>
+            </td>
+            <td><strong>₹{{ p.amount }}</strong></td>
+            <td><span class="badge bg-secondary">{{ p.date.strftime('%d %b %Y, %I:%M %p') if p.date else '-' }}</span></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
