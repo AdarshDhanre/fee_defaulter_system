@@ -1,4 +1,5 @@
 "use client";
+import { getBackendUrl } from "@/utils/api";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -81,9 +82,9 @@ export default function FeeManagement() {
     setLoading(true);
     try {
       const [allocationsRes, studentsRes, structuresRes] = await Promise.all([
-        axios.get("http://localhost:8080/api/fees"),
-        axios.get("http://localhost:8080/api/students"),
-        axios.get("http://localhost:8080/api/fees/structures"),
+        axios.get(getBackendUrl("/api/fees")),
+        axios.get(getBackendUrl("/api/students")),
+        axios.get(getBackendUrl("/api/fees/structures")),
       ]);
       setAllocations(allocationsRes.data);
       setStudents(studentsRes.data);
@@ -108,7 +109,7 @@ export default function FeeManagement() {
     setIsFetchingFee(true);
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/fees/student/${studentId}`,
+        getBackendUrl(`/api/fees/student/${studentId}`),
       );
       if (response.data?.total_fee !== undefined) {
         setTotalFee(response.data.total_fee);
@@ -130,7 +131,7 @@ export default function FeeManagement() {
     }
 
     try {
-      await axios.post("http://localhost:8080/api/fees", {
+      await axios.post(getBackendUrl("/api/fees"), {
         student_id: Number(selectedStudentId),
         total_fee: Number(totalFee),
         paid: Number(paidAmount),
@@ -150,7 +151,7 @@ export default function FeeManagement() {
     }
 
     try {
-      await axios.delete(`http://localhost:8080/api/fees/${id}`);
+      await axios.delete(getBackendUrl(`/api/fees/${id}`));
       fetchData();
     } catch (err) {
       alert("Failed to delete fee record.");

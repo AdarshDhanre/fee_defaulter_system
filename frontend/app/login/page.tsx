@@ -1,4 +1,5 @@
 "use client";
+import { getBackendUrl } from "@/utils/api";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -24,13 +25,10 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/auth/login",
-        {
-          username,
-          password,
-        },
-      );
+      const response = await axios.post(getBackendUrl("/api/auth/login"), {
+        username,
+        password,
+      });
 
       // Save session details
       localStorage.setItem("token", response.data.token);
@@ -40,6 +38,11 @@ export default function LoginPage() {
 
       router.push("/dashboard");
     } catch (err: any) {
+      if (err.response?.status === 403 && err.response?.data?.email) {
+        localStorage.setItem("verifyEmail", err.response.data.email);
+        router.push("/verify");
+        return;
+      }
       setError(
         err.response?.data?.error ||
           "Invalid username or password. Check credentials!",

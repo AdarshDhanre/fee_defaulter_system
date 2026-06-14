@@ -1,4 +1,5 @@
 "use client";
+import { getBackendUrl } from "@/utils/api";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -19,7 +20,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      await axios.post("http://localhost:8080/api/auth/register", {
+      await axios.post(getBackendUrl("/api/auth/register"), {
         username,
         email,
         password,

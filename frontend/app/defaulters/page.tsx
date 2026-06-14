@@ -1,4 +1,5 @@
 "use client";
+import { getBackendUrl } from "@/utils/api";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -43,7 +44,7 @@ export default function DefaultersList() {
     setLoading(true);
     setError("");
     try {
-      const response = await axios.get("http://localhost:8080/api/fees");
+      const response = await axios.get(getBackendUrl("/api/fees"));
       // Filter list of students who have outstanding due balances and are overdue or have unpaid fees
       const allocations = response.data;
       const overdueDefaulters = allocations
@@ -77,7 +78,7 @@ export default function DefaultersList() {
     setTriggering(true);
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/payments/alerts/overdue",
+        getBackendUrl("/api/payments/alerts/overdue"),
       );
       setActionMessage(
         response.data.message || "Overdue alert emails triggered successfully!",
@@ -97,7 +98,7 @@ export default function DefaultersList() {
     setTriggering(true);
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/payments/alerts/partial",
+        getBackendUrl("/api/payments/alerts/partial"),
       );
       setActionMessage(
         response.data.message ||

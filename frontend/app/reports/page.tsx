@@ -1,4 +1,5 @@
 "use client";
+import { getBackendUrl } from "@/utils/api";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -55,8 +56,8 @@ export default function ReportsPage() {
   const fetchData = async () => {
     try {
       const [statsRes, feesRes] = await Promise.all([
-        axios.get("http://localhost:8080/api/dashboard"),
-        axios.get("http://localhost:8080/api/fees"),
+        axios.get(getBackendUrl("/api/dashboard")),
+        axios.get(getBackendUrl("/api/fees")),
       ]);
       setStats(statsRes.data);
       setFees(feesRes.data);
@@ -69,7 +70,7 @@ export default function ReportsPage() {
 
   const handleDownloadCSV = () => {
     // Navigate directly to the download endpoint to trigger browser file download
-    window.open("http://localhost:8080/api/payments/export-csv", "_blank");
+    window.open(getBackendUrl("/api/payments/export-csv"), "_blank");
   };
 
   const handleSendOverdueAlerts = async () => {
@@ -77,7 +78,7 @@ export default function ReportsPage() {
     setAlertMessage(null);
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/payments/alerts/overdue",
+        getBackendUrl("/api/payments/alerts/overdue"),
       );
       setAlertMessage(response.data.message || "Alerts sent successfully!");
       setAlertType("success");
@@ -96,7 +97,7 @@ export default function ReportsPage() {
     setAlertMessage(null);
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/payments/alerts/partial",
+        getBackendUrl("/api/payments/alerts/partial"),
       );
       setAlertMessage(
         response.data.message || "Partial alerts sent successfully!",

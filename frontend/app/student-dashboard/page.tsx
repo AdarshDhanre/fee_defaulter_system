@@ -1,4 +1,5 @@
 "use client";
+import { getBackendUrl } from "@/utils/api";
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -105,7 +106,7 @@ export default function StudentDashboard() {
   const fetchStudentDashboard = async (id: string) => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/student-portal/dashboard/${id}`,
+        getBackendUrl(`/api/student-portal/dashboard/${id}`),
       );
       setStudentData(response.data);
       if (response.data.totalPayable) {
@@ -137,7 +138,7 @@ export default function StudentDashboard() {
     try {
       // 1. Create order on Spring Boot backend
       const orderRes = await axios.post(
-        "http://localhost:8080/api/student-portal/create-order",
+        getBackendUrl("/api/student-portal/create-order"),
         {
           student_id: Number(studentId),
           amount: Number(payAmount),
@@ -155,7 +156,7 @@ export default function StudentDashboard() {
         handler: async function (response: any) {
           try {
             const verifyRes = await axios.post(
-              "http://localhost:8080/api/student-portal/verify-payment",
+              getBackendUrl("/api/student-portal/verify-payment"),
               {
                 student_id: Number(studentId),
                 razorpay_payment_id: response.razorpay_payment_id,
@@ -225,7 +226,7 @@ export default function StudentDashboard() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/student-portal/upload-receipt",
+        getBackendUrl("/api/student-portal/upload-receipt"),
         formData,
         {
           headers: {
@@ -271,7 +272,7 @@ export default function StudentDashboard() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/student-portal/chat",
+        getBackendUrl("/api/student-portal/chat"),
         {
           student_id: Number(studentId),
           message: userText,
@@ -871,13 +872,13 @@ export default function StudentDashboard() {
                     {/* Challan image preview right */}
                     {r.filePath && (
                       <a
-                        href={`http://localhost:8080${r.filePath}`}
+                        href={getBackendUrl(`${r.filePath}`)}
                         target="_blank"
                         rel="noreferrer"
                         className="flex-shrink-0 border-2 border-slate-100 rounded-2xl overflow-hidden hover:opacity-90 transition-opacity block"
                       >
                         <img
-                          src={`http://localhost:8080${r.filePath}`}
+                          src={getBackendUrl(`${r.filePath}`)}
                           alt="Receipt Challan Preview"
                           className="w-[80px] height-[80px] object-cover"
                           onError={(e) => {

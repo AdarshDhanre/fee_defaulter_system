@@ -1,4 +1,5 @@
 "use client";
+import { getBackendUrl } from "@/utils/api";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -24,7 +25,7 @@ export default function StudentLoginPage() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/auth/student-login",
+        getBackendUrl("/api/auth/student-login"),
         {
           roll_no: rollNo,
           email: studentEmail,

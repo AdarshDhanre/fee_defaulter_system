@@ -1,4 +1,5 @@
 "use client";
+import { getBackendUrl } from "@/utils/api";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -28,7 +29,7 @@ export default function VerifyOtpPage() {
     setLoading(true);
 
     try {
-      await axios.post("http://localhost:8080/api/auth/verify-otp", {
+      await axios.post(getBackendUrl("/api/auth/verify-otp"), {
         email,
         otp,
       });

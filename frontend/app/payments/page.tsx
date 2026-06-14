@@ -1,4 +1,5 @@
 "use client";
+import { getBackendUrl } from "@/utils/api";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -49,8 +50,8 @@ export default function PaymentLogs() {
     setLoading(true);
     try {
       const [paymentsRes, studentsRes] = await Promise.all([
-        axios.get("http://localhost:8080/api/payments/history"),
-        axios.get("http://localhost:8080/api/students"),
+        axios.get(getBackendUrl("/api/payments/history")),
+        axios.get(getBackendUrl("/api/students")),
       ]);
       setPayments(paymentsRes.data);
       setStudents(studentsRes.data);
@@ -63,7 +64,7 @@ export default function PaymentLogs() {
 
   const handleExport = () => {
     // Navigate browser to download CSV endpoint
-    window.open("http://localhost:8080/api/payments/export-csv", "_blank");
+    window.open(getBackendUrl("/api/payments/export-csv"), "_blank");
   };
 
   const handleRecordPayment = async (e: React.FormEvent) => {
@@ -76,7 +77,7 @@ export default function PaymentLogs() {
     }
 
     try {
-      await axios.post("http://localhost:8080/api/payments/pay", {
+      await axios.post(getBackendUrl("/api/payments/pay"), {
         student_id: Number(selectedStudentId),
         amount: Number(amount),
       });

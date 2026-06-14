@@ -1,4 +1,5 @@
 "use client";
+import { getBackendUrl } from "@/utils/api";
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -60,7 +61,7 @@ export default function AdminDashboard() {
 
   const fetchStats = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/dashboard");
+      const response = await axios.get(getBackendUrl("/api/dashboard"));
       setStats(response.data);
     } catch (err) {
       setError("Failed to fetch dashboard data.");
@@ -75,7 +76,7 @@ export default function AdminDashboard() {
   ) => {
     setVerifyingId(receiptId);
     try {
-      await axios.post("http://localhost:8080/api/dashboard/verify-receipt", {
+      await axios.post(getBackendUrl("/api/dashboard/verify-receipt"), {
         receipt_id: receiptId,
         action,
       });
@@ -600,7 +601,7 @@ export default function AdminDashboard() {
                         </td>
                         <td className="p-4">
                           <a
-                            href={`http://localhost:8080${receipt.filePath}`}
+                            href={getBackendUrl(`${receipt.filePath}`)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 font-semibold text-xs border border-cyan-400/20 bg-cyan-400/10 py-1.5 px-3 rounded-lg w-max transition-colors"

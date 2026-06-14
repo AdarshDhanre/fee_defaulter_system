@@ -1,4 +1,5 @@
 "use client";
+import { getBackendUrl } from "@/utils/api";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -49,7 +50,7 @@ export default function StudentManagement() {
   const fetchStudents = async (query = "") => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/students${query ? `?search=${query}` : ""}`,
+        getBackendUrl(`/api/students${query ? `?search=${query}` : ""}`),
       );
       setStudents(response.data);
     } catch (err) {
@@ -98,12 +99,12 @@ export default function StudentManagement() {
       if (editingStudent) {
         // Edit student
         await axios.put(
-          `http://localhost:8080/api/students/${editingStudent.id}`,
+          getBackendUrl(`/api/students/${editingStudent.id}`),
           payload,
         );
       } else {
         // Add student
-        await axios.post("http://localhost:8080/api/students", payload);
+        await axios.post(getBackendUrl("/api/students"), payload);
       }
       setIsOpen(false);
       fetchStudents(search);
@@ -122,7 +123,7 @@ export default function StudentManagement() {
     }
 
     try {
-      await axios.delete(`http://localhost:8080/api/students/${id}`);
+      await axios.delete(getBackendUrl(`/api/students/${id}`));
       fetchStudents(search);
     } catch (err) {
       alert("Failed to delete student.");

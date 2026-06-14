@@ -50,6 +50,7 @@ public class AuthController {
             if (matches) {
                 if (Boolean.FALSE.equals(admin.getIsVerified())) {
                     response.put("error", "Account not verified! Please verify OTP.");
+                    response.put("email", admin.getEmail());
                     return ResponseEntity.status(403).body(response);
                 }
                 
@@ -196,6 +197,7 @@ public class AuthController {
             Admin admin = adminOpt.get();
             if (otp.equals(admin.getOtp())) {
                 admin.setPassword(passwordEncoder.encode(password));
+                admin.setIsVerified(true);
                 admin.setOtp(null);
                 adminRepository.save(admin);
 

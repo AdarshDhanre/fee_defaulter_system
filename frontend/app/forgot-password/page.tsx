@@ -1,4 +1,5 @@
 "use client";
+import { getBackendUrl } from "@/utils/api";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -23,7 +24,7 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      await axios.post("http://localhost:8080/api/auth/forgot-password", {
+      await axios.post(getBackendUrl("/api/auth/forgot-password"), {
         email,
       });
 
@@ -49,7 +50,7 @@ export default function ForgotPasswordPage() {
 
     setLoading(true);
     try {
-      await axios.post("http://localhost:8080/api/auth/reset-password", {
+      await axios.post(getBackendUrl("/api/auth/reset-password"), {
         email,
         otp,
         password,

@@ -25,6 +25,9 @@ public class FeeDefaulterApplication {
 
             // Parse DATABASE_URL if present (e.g. postgresql://user:pass@host:port/db)
             String dbUrl = dotenv.get("DATABASE_URL");
+            if (dbUrl == null || dbUrl.isEmpty()) {
+                dbUrl = System.getenv("DATABASE_URL");
+            }
             if (dbUrl != null && !dbUrl.isEmpty()) {
                 System.out.println("[INIT] Found DATABASE_URL in .env, parsing connection details...");
                 String cleanUrl = dbUrl.replace("postgresql://", "").replace("postgres://", "");

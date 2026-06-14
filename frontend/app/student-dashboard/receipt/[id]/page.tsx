@@ -1,4 +1,5 @@
 "use client";
+import { getBackendUrl } from "@/utils/api";
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -23,7 +24,7 @@ export default function StudentInvoiceReceipt() {
   const fetchReceipt = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/student-portal/receipt/${id}`,
+        getBackendUrl(`/api/student-portal/receipt/${id}`),
       );
       setReceipt(response.data);
     } catch (err) {

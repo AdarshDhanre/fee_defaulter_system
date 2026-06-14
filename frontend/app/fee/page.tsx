@@ -1,4 +1,5 @@
 "use client";
+import { getBackendUrl } from "@/utils/api";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -39,11 +40,11 @@ export default function AddFeePage() {
 
   const fetchStudents = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/students");
+      const response = await axios.get(getBackendUrl("/api/students"));
       setStudents(response.data);
 
       // Pre-set deadline if there is a previous record
-      const feesRes = await axios.get("http://localhost:8080/api/fees");
+      const feesRes = await axios.get(getBackendUrl("/api/fees"));
       if (feesRes.data && feesRes.data.length > 0) {
         // Find last fee record deadline
         const lastRecord = feesRes.data[feesRes.data.length - 1];
@@ -71,7 +72,7 @@ export default function AddFeePage() {
     setIsFetchingFee(true);
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/fees/student/${studentId}`,
+        getBackendUrl(`/api/fees/student/${studentId}`),
       );
       if (response.data?.total_fee !== undefined) {
         setTotalFee(response.data.total_fee);
@@ -95,7 +96,7 @@ export default function AddFeePage() {
     }
 
     try {
-      await axios.post("http://localhost:8080/api/fees", {
+      await axios.post(getBackendUrl("/api/fees"), {
         student_id: Number(selectedStudentId),
         total_fee: Number(totalFee),
         paid: paidAmount === "" ? 0 : Number(paidAmount),
