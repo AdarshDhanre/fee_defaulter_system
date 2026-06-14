@@ -45,7 +45,17 @@ public class StudentPortalController {
 
     private static final String RAZORPAY_KEY_ID = "rzp_test_Siz0DM75yKVLRd";
     private static final String RAZORPAY_KEY_SECRET = "DK4EXJsSjwq0coBhkEUQjTdf";
-    private static final String UPLOAD_DIR = "src/main/resources/static/uploads/receipts/";
+
+    private String getUploadDir() {
+        File dir = new File("src/main/resources/static/uploads/receipts/");
+        if (!dir.getParentFile().exists()) {
+            dir = new File("backend-java/src/main/resources/static/uploads/receipts/");
+        }
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        return dir.getAbsolutePath() + File.separator;
+    }
 
     @GetMapping("/dashboard/{studentId}")
     public ResponseEntity<?> getDashboardStats(@PathVariable Long studentId) {
@@ -284,10 +294,7 @@ public class StudentPortalController {
 
         try {
             // Save upload file
-            File dir = new File(UPLOAD_DIR);
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
+            String uploadDir = getUploadDir();
 
             String originalFilename = file.getOriginalFilename();
             String extension = "";
@@ -296,11 +303,11 @@ public class StudentPortalController {
             }
 
             String filename = "student_" + studentId + "_" + (System.currentTimeMillis() / 1000) + extension;
-            Path path = Paths.get(UPLOAD_DIR + filename);
+            Path path = Paths.get(uploadDir + filename);
             Files.write(path, file.getBytes());
 
             // Run OCR Service
-            Map<String, Object> ocrResult = ocrService.extractReceiptDataFromPath(UPLOAD_DIR + filename);
+            Map<String, Object> ocrResult = ocrService.extractReceiptDataFromPath(uploadDir + filename);
 
             if (ocrResult.containsKey("error")) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Failed to scan receipt: " + ocrResult.get("error")));
