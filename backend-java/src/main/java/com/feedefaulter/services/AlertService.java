@@ -27,30 +27,41 @@ public class AlertService {
 
     private void loadCredentials() {
         try {
-            // Path relative to java-app directory
-            File configFile = new File("../email_config.json");
-            if (configFile.exists()) {
-                ObjectMapper mapper = new ObjectMapper();
-                Map<?, ?> config = mapper.readValue(configFile, Map.class);
-                this.senderEmail = (String) config.get("email");
-                this.senderPassword = (String) config.get("password");
+            // Try loading from environment variables first (good for production)
+            this.senderEmail = System.getenv("EMAIL_SENDER");
+            this.senderPassword = System.getenv("EMAIL_PASSWORD");
+            
+            if (this.senderEmail == null || this.senderEmail.isEmpty()) {
+                this.senderEmail = System.getProperty("EMAIL_SENDER");
+                this.senderPassword = System.getProperty("EMAIL_PASSWORD");
+            }
 
-                if (this.senderEmail != null && this.senderPassword != null && !this.senderEmail.contains("your_")) {
-                    this.mailSender = new JavaMailSenderImpl();
-                    this.mailSender.setHost("smtp.gmail.com");
-                    this.mailSender.setPort(587);
-                    this.mailSender.setUsername(this.senderEmail);
-                    this.mailSender.setPassword(this.senderPassword);
-
-                    Properties props = this.mailSender.getJavaMailProperties();
-                    props.put("mail.transport.protocol", "smtp");
-                    props.put("mail.smtp.auth", "true");
-                    props.put("mail.smtp.starttls.enable", "true");
-                    props.put("mail.debug", "false");
-
-                    this.isConfigured = true;
-                    System.out.println("[INIT] Email AlertService configured with " + this.senderEmail);
+            // Fallback to email_config.json
+            if (this.senderEmail == null || this.senderEmail.isEmpty()) {
+                File configFile = new File("../email_config.json");
+                if (configFile.exists()) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    Map<?, ?> config = mapper.readValue(configFile, Map.class);
+                    this.senderEmail = (String) config.get("email");
+                    this.senderPassword = (String) config.get("password");
                 }
+            }
+
+            if (this.senderEmail != null && this.senderPassword != null && !this.senderEmail.contains("your_")) {
+                this.mailSender = new JavaMailSenderImpl();
+                this.mailSender.setHost("smtp.gmail.com");
+                this.mailSender.setPort(587);
+                this.mailSender.setUsername(this.senderEmail);
+                this.mailSender.setPassword(this.senderPassword);
+
+                Properties props = this.mailSender.getJavaMailProperties();
+                props.put("mail.transport.protocol", "smtp");
+                props.put("mail.smtp.auth", "true");
+                props.put("mail.smtp.starttls.enable", "true");
+                props.put("mail.debug", "false");
+
+                this.isConfigured = true;
+                System.out.println("[INIT] Email AlertService configured with " + this.senderEmail);
             }
         } catch (Exception e) {
             System.err.println("[ERROR] Failed to load email configuration: " + e.getMessage());
