@@ -19,6 +19,7 @@ public class AlertService {
     private String senderEmail;
     private String senderPassword;
     private JavaMailSenderImpl mailSender;
+    private String frontendUrl;
     private boolean isConfigured = false;
 
     public AlertService() {
@@ -27,6 +28,17 @@ public class AlertService {
 
     private void loadCredentials() {
         try {
+            // Load FRONTEND_URL
+            this.frontendUrl = System.getenv("FRONTEND_URL");
+            if (this.frontendUrl == null || this.frontendUrl.isEmpty()) {
+                this.frontendUrl = System.getProperty("FRONTEND_URL");
+            }
+            if (this.frontendUrl == null || this.frontendUrl.isEmpty()) {
+                this.frontendUrl = "http://localhost:3000";
+            }
+            if (this.frontendUrl.endsWith("/")) {
+                this.frontendUrl = this.frontendUrl.substring(0, this.frontendUrl.length() - 1);
+            }
             // Try loading from environment variables first (good for production)
             this.senderEmail = System.getenv("EMAIL_SENDER");
             this.senderPassword = System.getenv("EMAIL_PASSWORD");
@@ -275,7 +287,7 @@ public class AlertService {
             "            <p style=\"font-size: 15px; color: #555;\">To avoid any strict administrative actions or late fees, please pay your pending dues immediately via the student portal.</p>" +
             "            " +
             "            <div style=\"text-align: center; margin-top: 30px;\">" +
-            "                <a href=\"http://localhost:3000/student-login\" style=\"background-color: #4318FF; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;\">Login to Pay Fees</a>" +
+            "                <a href=\"" + this.frontendUrl + "/student-login\" style=\"background-color: #4318FF; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;\">Login to Pay Fees</a>" +
             "            </div>" +
             "        </div>" +
             "        <div style=\"background-color: #f8fafc; padding: 15px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #eee;\">" +
@@ -312,7 +324,7 @@ public class AlertService {
             "            <p style=\"font-size: 15px; color: #555;\">You can easily clear your remaining balance by logging into your student portal.</p>" +
             "            " +
             "            <div style=\"text-align: center; margin-top: 30px;\">" +
-            "                <a href=\"http://localhost:3000/student-login\" style=\"background-color: #4318FF; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;\">Pay Remaining Fee</a>" +
+            "                <a href=\"" + this.frontendUrl + "/student-login\" style=\"background-color: #4318FF; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;\">Pay Remaining Fee</a>" +
             "            </div>" +
             "        </div>" +
             "        <div style=\"background-color: #f8fafc; padding: 15px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #eee;\">" +
@@ -362,7 +374,7 @@ public class AlertService {
             "            <p style=\"font-size: 15px; color: #555;\">You can download your official payment receipt anytime from the student portal.</p>" +
             "            " +
             "            <div style=\"text-align: center; margin-top: 30px;\">" +
-            "                <a href=\"http://localhost:3000/student-login\" style=\"background-color: #4318FF; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;\">Login to Student Portal</a>" +
+            "                <a href=\"" + this.frontendUrl + "/student-login\" style=\"background-color: #4318FF; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;\">Login to Student Portal</a>" +
             "            </div>" +
             "        </div>" +
             "        <div style=\"background-color: #f8fafc; padding: 15px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #eee;\">" +
@@ -442,7 +454,7 @@ public class AlertService {
             "            <p style=\"font-size: 15px; color: #555; line-height: 1.7;\">" + nextStep + "</p>" +
             "            " +
             "            <div style=\"text-align: center; margin-top: 30px;\">" +
-            "                <a href=\"http://localhost:3000/student-login\" style=\"background-color: #4318FF; color: white; padding: 14px 30px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 15px; display: inline-block; letter-spacing: 0.5px;\">" + btnText + "</a>" +
+            "                <a href=\"" + this.frontendUrl + "/student-login\" style=\"background-color: #4318FF; color: white; padding: 14px 30px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 15px; display: inline-block; letter-spacing: 0.5px;\">" + btnText + "</a>" +
             "            </div>" +
             "        </div>" +
             "        <div style=\"background-color: #f8fafc; padding: 18px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #eee;\">" +

@@ -27,6 +27,23 @@ def get_email_credentials():
         return None, None
 
 
+# 🌐 Get Frontend URL
+def get_frontend_url():
+    url = os.environ.get("FRONTEND_URL")
+    if not url:
+        return "http://127.0.0.1:5000"
+    url = url.strip()
+    if url.endswith("/"):
+        url = url[:-1]
+    return url
+
+
+def get_student_login_url():
+    frontend_url = get_frontend_url()
+    login_path = "/student-login" if "3000" in frontend_url or "vercel" in frontend_url.lower() or "onrender" in frontend_url.lower() else "/student_login"
+    return f"{frontend_url}{login_path}"
+
+
 # 📧 Send Email Function
 def send_email(receiver_email, subject, message, is_html=True):
     # Check if primary or secondary n8n webhook URL is set
@@ -161,6 +178,8 @@ def alert_student(student_id):
     if not student or not fee:
         return False
 
+    login_url = get_student_login_url()
+
     if fee.status == "Overdue" or fee.paid_amount == 0:
         if fee.paid_amount == 0 and fee.status != "Overdue":
             subject = "🚨 Urgent: Fee Payment Required"
@@ -196,7 +215,7 @@ def alert_student(student_id):
                     <p style="font-size: 15px; color: #555;">To avoid any strict administrative actions or late fees, please pay your pending dues immediately via the student portal.</p>
                     
                     <div style="text-align: center; margin-top: 30px;">
-                        <a href="http://127.0.0.1:5000/student_login" style="background-color: #4318FF; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Login to Pay Fees</a>
+                        <a href="{login_url}" style="background-color: #4318FF; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Login to Pay Fees</a>
                     </div>
                 </div>
                 <div style="background-color: #f8fafc; padding: 15px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #eee;">
@@ -249,6 +268,8 @@ def alert_partial_student(student_id):
     if not student or not fee:
         return False
 
+    login_url = get_student_login_url()
+
     if fee.status == "Partial":
         subject = "🔔 Friendly Reminder: Remaining Fee Balance"
 
@@ -272,7 +293,7 @@ def alert_partial_student(student_id):
                     <p style="font-size: 15px; color: #555;">You can easily clear your remaining balance by logging into your student portal.</p>
                     
                     <div style="text-align: center; margin-top: 30px;">
-                        <a href="http://127.0.0.1:5000/student_login" style="background-color: #4318FF; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Pay Remaining Fee</a>
+                        <a href="{login_url}" style="background-color: #4318FF; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Pay Remaining Fee</a>
                     </div>
                 </div>
                 <div style="background-color: #f8fafc; padding: 15px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #eee;">
@@ -296,6 +317,8 @@ def send_payment_success_email(student_id, amount_paid, payment_id):
 
     if not student or not fee:
         return False
+
+    login_url = get_student_login_url()
 
     is_fully_paid = fee.due_amount <= 0
     subject = f"🎉 Payment Received: Receipt #{payment_id}" if not is_fully_paid else "🎊 Congratulations! Your Fees are Fully Paid"
@@ -327,7 +350,7 @@ def send_payment_success_email(student_id, amount_paid, payment_id):
                 <p style="font-size: 15px; color: #555;">You can download your official payment receipt anytime from the student portal.</p>
                 
                 <div style="text-align: center; margin-top: 30px;">
-                    <a href="http://127.0.0.1:5000/student_login" style="background-color: #4318FF; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Login to Student Portal</a>
+                    <a href="{login_url}" style="background-color: #4318FF; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Login to Student Portal</a>
                 </div>
             </div>
             <div style="background-color: #f8fafc; padding: 15px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #eee;">
@@ -375,6 +398,8 @@ def send_receipt_status_email(student_id, receipt_id, action, extracted_amount, 
     student = Student.query.get(student_id)
     if not student:
         return False
+
+    login_url = get_student_login_url()
 
     is_approved = (action == "approve")
 
@@ -450,7 +475,7 @@ def send_receipt_status_email(student_id, receipt_id, action, extracted_amount, 
 
                 <!-- CTA Button -->
                 <div style="text-align: center; margin-top: 30px;">
-                    <a href="http://127.0.0.1:5000/student_login"
+                    <a href="{login_url}"
                        style="background-color: #4318FF; color: white; padding: 14px 30px;
                               text-decoration: none; border-radius: 8px; font-weight: 700;
                               font-size: 15px; display: inline-block; letter-spacing: 0.5px;">
