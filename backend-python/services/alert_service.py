@@ -45,7 +45,7 @@ def get_student_login_url():
 
 
 # 📧 Send Email Function
-def send_email(receiver_email, subject, message, is_html=True):
+def send_email(receiver_email, subject, message, is_html=True, student=None, fee=None, amount_paid=None, payment_id=None):
     # Check if primary or secondary n8n webhook URL is set
     n8n_primary_url = os.environ.get("N8N_WEBHOOK_URL")
     n8n_secondary_url = os.environ.get("N8N_RENDER_WEBHOOK_URL")
@@ -113,6 +113,23 @@ def send_email(receiver_email, subject, message, is_html=True):
             "html_message": html_content,
             "otp_code": otp_code
         }
+
+        if student:
+            payload["student_id"] = student.id
+            payload["student_roll"] = student.roll_no
+            payload["student_course"] = student.course
+            payload["student_branch"] = student.branch
+            payload["student_year"] = student.year
+            payload["student_category"] = student.category
+        if fee:
+            payload["fee_total"] = fee.total_fee
+            payload["fee_paid"] = fee.paid_amount
+            payload["fee_due"] = fee.due_amount
+            payload["fee_status"] = fee.status
+        if amount_paid is not None:
+            payload["amount_paid"] = amount_paid
+        if payment_id is not None:
+            payload["payment_id"] = payment_id
 
         for name, url in webhooks_to_try:
             try:
@@ -226,7 +243,7 @@ def alert_student(student_id):
         </html>
         """
 
-        return send_email(student.email, subject, html_message, is_html=True)
+        return send_email(student.email, subject, html_message, is_html=True, student=student, fee=fee)
 
     return False
 
@@ -305,7 +322,7 @@ def alert_partial_student(student_id):
         </html>
         """
         
-        return send_email(student.email, subject, html_message, is_html=True)
+        return send_email(student.email, subject, html_message, is_html=True, student=student, fee=fee)
 
     return False
 
@@ -362,7 +379,7 @@ def send_payment_success_email(student_id, amount_paid, payment_id):
     </html>
     """
     
-    return send_email(student.email, subject, html_message, is_html=True)
+    return send_email(student.email, subject, html_message, is_html=True, student=student, fee=fee, amount_paid=amount_paid, payment_id=payment_id)
 
 # 📌 Alert All Partial Students
 def alert_all_partials():
@@ -494,4 +511,4 @@ def send_receipt_status_email(student_id, receipt_id, action, extracted_amount, 
     </html>
     """
 
-    return send_email(student.email, subject, html_message, is_html=True)
+    return send_email(student.email, subject, html_message, is_html=True, student=student, amount_paid=extracted_amount, payment_id=receipt_id)

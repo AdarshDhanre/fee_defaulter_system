@@ -81,6 +81,10 @@ public class AlertService {
     }
 
     public boolean sendEmail(String receiverEmail, String subject, String messageContent, boolean isHtml) {
+        return sendEmail(receiverEmail, subject, messageContent, isHtml, null, null, null, null);
+    }
+
+    public boolean sendEmail(String receiverEmail, String subject, String messageContent, boolean isHtml, Student student, Fee fee, Integer amountPaid, Long paymentId) {
         String n8nPrimaryUrl = System.getenv("N8N_WEBHOOK_URL");
         if (n8nPrimaryUrl == null || n8nPrimaryUrl.isEmpty()) {
             n8nPrimaryUrl = System.getProperty("N8N_WEBHOOK_URL");
@@ -166,6 +170,27 @@ public class AlertService {
                 payload.put("subject", subject);
                 payload.put("html_message", htmlContent);
                 payload.put("otp_code", otpCode);
+
+                if (student != null) {
+                    payload.put("student_id", student.getId());
+                    payload.put("student_roll", student.getRollNo());
+                    payload.put("student_course", student.getCourse());
+                    payload.put("student_branch", student.getBranch());
+                    payload.put("student_year", student.getYear());
+                    payload.put("student_category", student.getCategory());
+                }
+                if (fee != null) {
+                    payload.put("fee_total", fee.getTotalFee());
+                    payload.put("fee_paid", fee.getPaidAmount());
+                    payload.put("fee_due", fee.getDueAmount());
+                    payload.put("fee_status", fee.getStatus());
+                }
+                if (amountPaid != null) {
+                    payload.put("amount_paid", amountPaid);
+                }
+                if (paymentId != null) {
+                    payload.put("payment_id", paymentId);
+                }
 
                 String jsonPayload = mapper.writeValueAsString(payload);
 
@@ -297,7 +322,7 @@ public class AlertService {
             "</body>" +
             "</html>";
 
-        return sendEmail(student.getEmail(), subject, htmlMessage, true);
+        return sendEmail(student.getEmail(), subject, htmlMessage, true, student, fee, null, null);
     }
 
     public boolean alertPartialStudent(Student student, Fee fee) {
@@ -335,7 +360,7 @@ public class AlertService {
             "</body>" +
             "</html>";
 
-        return sendEmail(student.getEmail(), subject, htmlMessage, true);
+        return sendEmail(student.getEmail(), subject, htmlMessage, true, student, fee, null, null);
     }
 
     public boolean sendPaymentSuccessEmail(Student student, Fee fee, Integer amountPaid, Long paymentId) {
@@ -385,7 +410,7 @@ public class AlertService {
             "</body>" +
             "</html>";
 
-        return sendEmail(student.getEmail(), isFullyPaid ? "🎊 Fees Fully Paid" : "🎉 Payment Success", htmlMessage, true);
+        return sendEmail(student.getEmail(), isFullyPaid ? "🎊 Fees Fully Paid" : "🎉 Payment Success", htmlMessage, true, student, fee, amountPaid, paymentId);
     }
 
     public boolean sendReceiptStatusEmail(Student student, Long receiptId, String action, Integer extractedAmount, String extractedUtr) {
@@ -464,6 +489,6 @@ public class AlertService {
             "</body>" +
             "</html>";
 
-        return sendEmail(student.getEmail(), subject, htmlMessage, true);
+        return sendEmail(student.getEmail(), subject, htmlMessage, true, student, null, extractedAmount, receiptId);
     }
 }
