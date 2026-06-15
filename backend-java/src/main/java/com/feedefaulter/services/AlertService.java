@@ -222,6 +222,9 @@ public class AlertService {
             return true;
         } catch (Exception e) {
             System.err.println("[ERROR] Email sending failed: " + e.getMessage());
+            if (e.getMessage() != null && (e.getMessage().contains("Connection timed out") || e.getMessage().contains("Couldn't connect to host"))) {
+                System.err.println("[NOTE] Outbound SMTP ports (587, 465, 25) are blocked by default on cloud hosting providers like Render. If you are deployed on Render, please make sure your n8n service is configured correctly (so that Java uses Webhook rather than falling back to SMTP), or run the Java backend locally.");
+            }
             return false;
         }
     }

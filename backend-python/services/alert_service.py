@@ -148,6 +148,8 @@ def send_email(receiver_email, subject, message, is_html=True):
         return False
     except Exception as e:
         print("[ERROR] Email error:", e)
+        if "timeout" in str(e).lower() or "connection timed out" in str(e).lower() or "connection refused" in str(e).lower():
+            print("[NOTE] Outbound SMTP ports (587, 465, 25) are blocked by default on cloud hosting providers like Render. If you are deployed on Render, please make sure your n8n service is configured correctly (so that Python uses Webhook rather than falling back to SMTP), or run this backend locally.")
         return False
 
 
