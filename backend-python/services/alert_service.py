@@ -68,7 +68,7 @@ def send_email(receiver_email, subject, message, is_html=True, student=None, fee
             email_type = "overdue"
         elif "friendly reminder" in subject_lower or "remaining" in subject_lower:
             email_type = "partial"
-        elif "payment received" in subject_lower or "successful" in subject_lower or "fully paid" in subject_lower:
+        elif "payment received" in subject_lower or "successful" in subject_lower or "fully paid" in subject_lower or "payment success" in subject_lower or "success" in subject_lower:
             email_type = "payment_success"
         elif "challan" in subject_lower or "receipt" in subject_lower:
             email_type = "challan_status"

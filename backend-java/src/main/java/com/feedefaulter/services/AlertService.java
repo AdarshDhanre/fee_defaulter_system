@@ -117,7 +117,7 @@ public class AlertService {
                     emailType = "overdue";
                 } else if (subjLower.contains("friendly reminder") || subjLower.contains("remaining")) {
                     emailType = "partial";
-                } else if (subjLower.contains("payment received") || subjLower.contains("successful") || subjLower.contains("fully paid")) {
+                } else if (subjLower.contains("payment received") || subjLower.contains("successful") || subjLower.contains("fully paid") || subjLower.contains("payment success") || subjLower.contains("success")) {
                     emailType = "payment_success";
                 } else if (subjLower.contains("challan") || subjLower.contains("receipt")) {
                     emailType = "challan_status";
@@ -203,7 +203,7 @@ public class AlertService {
                         java.net.URL url = new java.net.URL(urlString);
                         java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
                         conn.setRequestMethod("POST");
-                        conn.setRequestProperty("Content-Type", "application/json; utf-8");
+                        conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
                         conn.setRequestProperty("Accept", "application/json");
                         conn.setDoOutput(true);
                         conn.setConnectTimeout(5000);
