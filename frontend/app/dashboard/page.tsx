@@ -7,7 +7,7 @@ import Link from "next/link";
 import axios from "axios";
 import Sidebar from "@/components/Sidebar";
 import { Chart, registerables } from "chart.js";
-import { Check, X, FileText, Sparkles } from "lucide-react";
+import { Check, X, FileText, Sparkles, Users, CheckCircle2, PieChart, OctagonAlert, Clock, Calendar, Zap } from "lucide-react";
 
 if (typeof window !== "undefined") {
   Chart.register(...registerables);
@@ -387,7 +387,7 @@ export default function AdminDashboard() {
             className="text-slate-400 flex items-center gap-1.5"
             style={{ fontSize: "0.9rem" }}
           >
-            <i className="bi bi-calendar-event me-1"></i> Today:{" "}
+            <Calendar className="w-4 h-4" /> Today:{" "}
             <span id="currentDate">{currentDate}</span>
           </div>
         </div>
@@ -410,7 +410,7 @@ export default function AdminDashboard() {
                 boxShadow: "0 0 15px rgba(59,130,246,0.3)",
               }}
             >
-              <i className="bi bi-people-fill"></i>
+              <Users className="w-6 h-6" />
             </div>
             <div className="metric-info">
               <p className="metric-title">Total Students</p>
@@ -428,7 +428,7 @@ export default function AdminDashboard() {
                 boxShadow: "0 0 15px rgba(16,185,129,0.3)",
               }}
             >
-              <i className="bi bi-check-circle-fill"></i>
+              <CheckCircle2 className="w-6 h-6" />
             </div>
             <div className="metric-info">
               <p className="metric-title">Fully Paid</p>
@@ -446,7 +446,7 @@ export default function AdminDashboard() {
                 boxShadow: "0 0 15px rgba(245,158,11,0.3)",
               }}
             >
-              <i className="bi bi-pie-chart-fill"></i>
+              <PieChart className="w-6 h-6" />
             </div>
             <div className="metric-info">
               <p className="metric-title">Partial</p>
@@ -464,7 +464,7 @@ export default function AdminDashboard() {
                 boxShadow: "0 0 15px rgba(239,68,68,0.3)",
               }}
             >
-              <i className="bi bi-exclamation-octagon-fill"></i>
+              <OctagonAlert className="w-6 h-6" />
             </div>
             <div className="metric-info">
               <p className="metric-title">Overdue</p>
@@ -481,7 +481,7 @@ export default function AdminDashboard() {
               className="metric-icon"
               style={{ background: "rgba(239, 68, 68, 0.1)", color: "#ef4444" }}
             >
-              <i className="bi bi-clock-history"></i>
+              <Clock className="w-6 h-6" />
             </div>
             <div className="metric-info">
               <p className="metric-title">Pending Fine</p>
@@ -508,7 +508,7 @@ export default function AdminDashboard() {
           <div>
             <div className="dashboard-panel flex flex-col justify-center items-center text-center h-full min-h-[300px]">
               <div className="status-ring mb-4">
-                <i className="bi bi-lightning-charge-fill text-[2.2rem] text-[#8b5cf6]"></i>
+                <Zap className="w-9 h-9 text-[#8b5cf6]" />
               </div>
               <h4 className="text-white text-lg font-bold mb-2">
                 Quick Actions

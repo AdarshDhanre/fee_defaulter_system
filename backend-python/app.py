@@ -84,10 +84,17 @@ def create_app():
         from services.cron_service import start_scheduler
         start_scheduler(app)
 
+    # ✅ Health check endpoint for Render keep-alive ping
+    from flask import jsonify
+
+    @app.route("/health")
+    def health():
+        return jsonify({"status": "ok"}), 200
+
     return app
 
 # Main entry point for gunicorn/production
 app = create_app()
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True)

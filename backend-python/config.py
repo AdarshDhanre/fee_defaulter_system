@@ -29,4 +29,14 @@ else:
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(basedir, "database", "db.sqlite3").replace("\\", "/")
     print("[DATABASE] Connected to SQLite (Fallback)")
 
-SQLALCHEMY_TRACK_MODIFICATIONS = False
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+# ✅ Connection Pool settings — critical for Render (prevents stale connection drops)
+SQLALCHEMY_ENGINE_OPTIONS = {
+    "pool_pre_ping": True,    # Test connection before use (avoids stale connection errors)
+    "pool_recycle": 300,      # Recycle connections every 5 min (Render drops idle connections)
+    "pool_size": 5,           # Max 5 persistent connections
+    "max_overflow": 10,       # Up to 10 overflow connections under load
+    "connect_args": {},
+}
+

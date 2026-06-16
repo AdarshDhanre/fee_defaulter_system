@@ -4,48 +4,90 @@ from models.fee_model import Fee
 
 from extensions import db
 from sqlalchemy import func
+from datetime import datetime
+import time
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
-@dashboard_bp.route("/dashboard")
-def dashboard():
-    from datetime import datetime
+# ⚡ Simple in-memory cache (60 second TTL) to avoid re-computing on every request
+_dashboard_cache = {"data": None, "expires_at": 0}
+CACHE_TTL_SECONDS = 60
+
+
+def _get_dashboard_stats():
+    """Compute heavy dashboard stats with a short-lived cache."""
+    now_ts = time.time()
+    if _dashboard_cache["data"] and now_ts < _dashboard_cache["expires_at"]:
+        return _dashboard_cache["data"]
+
+    now = datetime.now()
 
     students_count = Student.query.count()
-    
-    # 🚀 HIGH PERFORMANCE QUERYING
-    # Calculate counts using actual DB columns, since 'status' is a python property
+
+    # ✅ Efficient counts via SQL — avoids loading all rows
     paid_count = Fee.query.filter(Fee.total_fee <= Fee.paid_amount).count()
-    overdue_count = Fee.query.filter(Fee.total_fee > Fee.paid_amount, Fee.deadline.is_not(None), Fee.deadline < datetime.now()).count()
-    partial_count = Fee.query.filter(Fee.total_fee > Fee.paid_amount, (Fee.deadline.is_(None)) | (Fee.deadline >= datetime.now())).count()
+    overdue_count = Fee.query.filter(
+        Fee.total_fee > Fee.paid_amount,
+        Fee.deadline.isnot(None),
+        Fee.deadline < now,
+    ).count()
+    partial_count = Fee.query.filter(
+        Fee.total_fee > Fee.paid_amount,
+        (Fee.deadline.is_(None)) | (Fee.deadline >= now),
+    ).count()
 
-    # 📊 Fetch Branch-wise Revenue for Bar Chart
-    branch_revenue_data = db.session.query(
-        Student.branch, 
-        func.sum(Fee.paid_amount)
-    ).join(Fee, Student.id == Fee.student_id).group_by(Student.branch).all()
-
-    # Convert to lists for JSON serialization in the template
-    branch_labels = [row[0] if row[0] else 'Unknown' for row in branch_revenue_data]
+    # 📊 Branch-wise revenue via SQL GROUP BY
+    branch_revenue_data = (
+        db.session.query(Student.branch, func.sum(Fee.paid_amount))
+        .join(Fee, Student.id == Fee.student_id)
+        .group_by(Student.branch)
+        .all()
+    )
+    branch_labels = [row[0] if row[0] else "Unknown" for row in branch_revenue_data]
     branch_revenue = [float(row[1]) if row[1] else 0 for row in branch_revenue_data]
 
-    # Calculate total fine pending
-    all_fees = Fee.query.all()
-    total_fine_pending = sum([f.late_fine for f in all_fees])
-    
-    # 🧾 Fetch Pending Offline Receipts for Verification
-    from models.payment_model import OfflineReceipt
-    pending_receipts = OfflineReceipt.query.filter_by(status='Pending').all()
+    # ✅ Total fine: calculate only for overdue records (avoids loading all fees into Python)
+    overdue_fees = Fee.query.filter(
+        Fee.total_fee > Fee.paid_amount,
+        Fee.deadline.isnot(None),
+        Fee.deadline < now,
+    ).all()
+    total_fine_pending = sum(f.late_fine for f in overdue_fees)
 
-    return render_template("dashboard.html",
-                           total=students_count,
-                           paid=paid_count,
-                           overdue=overdue_count,
-                           partial=partial_count,
-                           total_fine=total_fine_pending,
-                           branch_labels=branch_labels,
-                           branch_revenue=branch_revenue,
-                           pending_receipts=pending_receipts)
+    from models.payment_model import OfflineReceipt
+    pending_receipts = OfflineReceipt.query.filter_by(status="Pending").all()
+
+    stats = {
+        "students_count": students_count,
+        "paid_count": paid_count,
+        "overdue_count": overdue_count,
+        "partial_count": partial_count,
+        "branch_labels": branch_labels,
+        "branch_revenue": branch_revenue,
+        "total_fine_pending": total_fine_pending,
+        "pending_receipts": pending_receipts,
+    }
+
+    _dashboard_cache["data"] = stats
+    _dashboard_cache["expires_at"] = now_ts + CACHE_TTL_SECONDS
+    return stats
+
+
+@dashboard_bp.route("/dashboard")
+def dashboard():
+    s = _get_dashboard_stats()
+    return render_template(
+        "dashboard.html",
+        total=s["students_count"],
+        paid=s["paid_count"],
+        overdue=s["overdue_count"],
+        partial=s["partial_count"],
+        total_fine=s["total_fine_pending"],
+        branch_labels=s["branch_labels"],
+        branch_revenue=s["branch_revenue"],
+        pending_receipts=s["pending_receipts"],
+    )
+
 
 from flask import request, jsonify
 from models.payment_model import Payment, OfflineReceipt
