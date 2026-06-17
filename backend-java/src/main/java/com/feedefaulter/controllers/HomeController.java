@@ -16,4 +16,17 @@ public class HomeController {
             "database", "Connected to Supabase PostgreSQL"
         ));
     }
+
+    /**
+     * Lightweight health-check endpoint.
+     * Used by the frontend login page to warm up the Render backend
+     * on mount — so cold start happens while the user is typing credentials.
+     */
+    @GetMapping("/api/health")
+    public ResponseEntity<Map<String, String>> health() {
+        return ResponseEntity.ok(Map.of(
+            "status", "UP",
+            "message", "Server is warm and ready!"
+        ));
+    }
 }

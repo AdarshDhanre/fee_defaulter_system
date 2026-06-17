@@ -173,7 +173,7 @@ export default function FeeManagement() {
             </p>
           </div>
           <button
-            onClick={() => router.push("/fee")}
+            onClick={() => setIsOpen(true)}
             className="btn-glow-primary hover:brightness-110 text-white py-3 px-6 rounded-full font-bold flex items-center gap-2 shadow-lg transform active:scale-95 transition-all text-sm"
           >
             <Plus className="w-4 h-4" />

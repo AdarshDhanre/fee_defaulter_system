@@ -32,7 +32,7 @@ export default function StudentManagement() {
   // Form State
   const [name, setName] = useState("");
   const [rollNo, setRollNo] = useState("");
-  const [course, setCourse] = useState("B.Tech");
+  const [course, setCourse] = useState("B. Tech");
   const [year, setYear] = useState("First Year");
   const [branch, setBranch] = useState("Computer Science");
   const [category, setCategory] = useState("Open");

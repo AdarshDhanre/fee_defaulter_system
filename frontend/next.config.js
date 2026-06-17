@@ -6,18 +6,31 @@ const nextConfig = {
   // ✅ Remove X-Powered-By header (minor security + perf)
   poweredByHeader: false,
 
-  // ✅ Optimize images
-  images: {
-    domains: ["cdn-icons-png.flaticon.com"],
-    formats: ["image/avif", "image/webp"],
-  },
+  // ✅ Use SWC minifier (faster & smaller than Terser)
+  swcMinify: true,
 
-  // ✅ Experimental optimizations
+  // ✅ Restore scroll position on back/forward navigation
   experimental: {
-    optimizeCss: true,           // Inline critical CSS, reduce render-blocking
-    optimizePackageImports: [    // Tree-shake large icon libs
+    scrollRestoration: true,
+
+    // ✅ Inline critical CSS, reduce render-blocking
+    optimizeCss: true,
+
+    // ✅ Tree-shake large icon/chart libs — only bundle what's imported
+    optimizePackageImports: [
       "lucide-react",
       "chart.js",
+    ],
+  },
+
+  // ✅ Optimize images (AVIF + WebP)
+  images: {
+    formats: ["image/avif", "image/webp"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "cdn-icons-png.flaticon.com",
+      },
     ],
   },
 };

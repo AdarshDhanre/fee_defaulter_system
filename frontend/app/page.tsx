@@ -316,7 +316,7 @@ export default function StudentDashboard() {
     <div className="min-h-screen bg-[#f4f7fe] text-[#2B3674] font-outfit flex">
       <Script
         src="https://checkout.razorpay.com/v1/checkout.js"
-        strategy="lazyOnload"
+        strategy="afterInteractive"
       />
 
       {/* Sidebar Navigation */}
@@ -881,6 +881,7 @@ export default function StudentDashboard() {
                           src={getBackendUrl(`${r.filePath}`)}
                           alt="Receipt Challan Preview"
                           className="w-[80px] height-[80px] object-cover"
+                          loading="lazy"
                           onError={(e) => {
                             (e.target as any).src =
                               "https://cdn-icons-png.flaticon.com/512/3342/3342137.png";
