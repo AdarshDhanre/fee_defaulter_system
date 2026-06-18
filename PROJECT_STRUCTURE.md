@@ -1,105 +1,215 @@
-# Fee Defaulter System - Project Structure & Architecture
+# Fee Defaulter System — Detailed Project Structure & Architecture
 
-Welcome to the **Fee Defaulter System** repository. This document describes the structure of the project, its components, database connection mechanisms, and how to run the services.
+This document provides an in-depth guide to the repository layout, component responsibilities, database layer, and service integrations.
 
 ---
 
 ## 1. System Architecture Overview
 
-The application is structured as a monorepo consisting of:
-*   **`frontend/`**: Next.js client application written in TypeScript and styled with Tailwind CSS. It communicates with the backend services via REST APIs.
-*   **`backend-java/`**: Spring Boot application acting as the primary enterprise backend. It exposes APIs for user authentication, student management, fee payments, and offline receipt OCR verification.
-*   **`backend-python/`**: Flask application which can be used as an alternative backend, helper, or standalone Python application containing database seed utilities and automated services.
-*   **`Supabase PostgreSQL Database`**: Hosted PostgreSQL instance serving as the unified persistent data layer for both Java and Python backends.
+The application is a **hybrid monorepo** consisting of:
+
+| Component | Technology | Port | Role |
+|---|---|---|---|
+| `frontend/` | Next.js 14, TypeScript, Tailwind CSS | 3000 | Admin Dashboard + Student Portal UI |
+| `backend-java/` | Spring Boot, Spring Data JPA, Maven | 8080 | Enterprise REST API (primary backend) |
+| `backend-python/` | Flask, SQLAlchemy, Flask-CORS | 5000 | Automation Engine (OCR, Payments, Alerts) |
+| `Supabase` | PostgreSQL | cloud | Shared persistent database |
+| `n8n` | Workflow automation | cloud/5678 | Email delivery + Google Sheets logging |
 
 ---
 
-## 2. Directory Layout & Key Files
+## 2. Full Directory Layout
 
 ```
 fee-defaulter-system/
-├── .github/                   # GitHub action files
-├── .venv/                     # Python virtual environment (ignored)
-├── venv/                      # Python virtual environment (ignored)
-├── backend-java/              # Spring Boot backend application
-│   ├── src/main/java/         # Java source code (models, repositories, services, etc.)
-│   ├── src/main/resources/    # Application configurations (application.properties)
-│   └── pom.xml                # Maven project descriptor
-├── backend-python/            # Flask backend application
-│   ├── models/                # SQLAlchemy database models
-│   ├── routes/                # Flask route blueprints
-│   ├── services/              # Automated background schedulers, alerting, and Gemini OCR
-│   ├── database/              # Local SQLite database fallbacks (ignored)
-│   ├── config.py              # Configuration manager for environment variables
-│   └── app.py                 # Python main entrypoint
-├── frontend/                  # Next.js web application
-│   ├── app/                   # Next.js App Router (pages and layouts)
-│   ├── components/            # Reusable React components (Sidebar, etc.)
-│   ├── package.json           # Node project descriptor
-│   └── tailwind.config.ts     # Tailwind CSS styling configurations
-├── .env                       # Environment variables (private, ignored)
-├── .env.example               # Template environment configuration file
-├── email_config.json          # Email service configurations (private, ignored)
-├── requirements.txt           # Python backend dependencies
-├── run_project.bat            # Windows startup script to launch Java and Next.js services
-└── PROJECT_STRUCTURE.md       # Project structure guide (this file)
+│
+├── .env                             # Private env vars (gitignored)
+├── .env.example                     # Template for env setup
+├── email_config.json                # SMTP fallback credentials (gitignored)
+├── requirements.txt                 # Python pip dependencies
+├── run_project.bat                  # Windows: starts Java + Next.js concurrently
+├── n8n_workflow_fixed.json          # Ready-to-import n8n automation workflow
+├── README.md                        # Main project readme
+├── PROJECT_STRUCTURE.md             # This file
+│
+├── backend-java/                    # Spring Boot Enterprise Backend
+│   ├── Dockerfile
+│   ├── pom.xml                      # Maven build + dependency descriptor
+│   └── src/main/java/com/feedefaulter/
+│       ├── FeeDefaulterApplication.java   # Entrypoint; loads .env, starts Spring
+│       ├── config/                        # Security & CORS configuration
+│       ├── controllers/                   # HTTP REST controllers
+│       │   └── HomeController.java
+│       ├── models/                        # JPA Entity classes (Student, Fee, Payment...)
+│       ├── repositories/                  # Spring Data JPA repository interfaces
+│       ├── services/                      # Business logic + service layer
+│       └── utils/                         # Utility helpers
+│
+├── backend-python/                  # Flask Automation & OCR Backend
+│   ├── app.py                       # Entrypoint: creates Flask app, registers blueprints, CORS
+│   ├── config.py                    # DB URI config: PostgreSQL or SQLite fallback
+│   ├── extensions.py                # Shared SQLAlchemy `db` instance
+│   ├── seed.py                      # Seeds demo students + admin accounts
+│   ├── seed_fees.py                 # Seeds fee structure records
+│   ├── migrate_db.py                # DB migration helper
+│   ├── fix_admin.py                 # Admin account repair utility
+│   ├── run_prod.py                  # Production server runner (Gunicorn/Waitress)
+│   │
+│   ├── models/                      # SQLAlchemy ORM models (shared with Java via PostgreSQL)
+│   │   ├── student_model.py         # Student: name, roll_no, email, course, branch, year, category
+│   │   ├── fee_model.py             # Fee: total_fee, paid_amount, due_amount, late_fine, deadline, status
+│   │   ├── payment_model.py         # Payment + OfflineReceipt (challan) models
+│   │   ├── admin_model.py           # Admin: username, email, OTP fields
+│   │   └── fee_structure_model.py   # FeeStructure: course/branch/year fee templates
+│   │
+│   ├── routes/                      # Flask Blueprint route handlers
+│   │   ├── auth_routes.py           # Admin: login, OTP verify, password reset
+│   │   ├── student_routes.py        # Admin CRUD: add/edit/delete students
+│   │   ├── fee_routes.py            # Admin: assign fees, update due amounts
+│   │   ├── payment_routes.py        # Manual payment + sends email + logs to Google Sheets
+│   │   ├── student_portal_routes.py # Student: Razorpay checkout, verify payment, AI chat,
+│   │   │                            #          upload offline challan receipt (Gemini OCR)
+│   │   ├── dashboard_routes.py      # Admin dashboard: live analytics & stats
+│   │   ├── defaulter_routes.py      # Defaulter list + send overdue alerts
+│   │   ├── report_routes.py         # Generate payment reports
+│   │   └── api_routes.py            # Secure JSON API for n8n → backend callbacks
+│   │                                #   POST /api/verify_receipt (approve/reject challan)
+│   │
+│   ├── services/                    # Background service layer
+│   │   ├── alert_service.py         # Core notification engine:
+│   │   │                            #   - send_email(): n8n webhook → Brevo → SMTP fallback
+│   │   │                            #   - log_payment_to_sheets(): dedicated Google Sheets webhook
+│   │   │                            #   - alert_student(), alert_all_defaulters()
+│   │   │                            #   - send_payment_success_email()
+│   │   │                            #   - send_receipt_status_email()
+│   │   ├── ocr_service.py           # Gemini 2.5 Flash: scans receipt image → JSON
+│   │   ├── cron_service.py          # APScheduler: auto-alerts for overdue fees
+│   │   └── report_service.py        # PDF/report generation
+│   │
+│   ├── templates/                   # Jinja2 HTML templates (Flask admin UI)
+│   │   ├── base.html
+│   │   ├── dashboard.html
+│   │   ├── students.html
+│   │   ├── payment.html
+│   │   ├── payments_list.html
+│   │   └── student_portal/          # Student portal templates
+│   │       ├── dashboard.html
+│   │       └── receipt.html
+│   │
+│   └── static/                      # Static assets
+│       └── uploads/receipts/        # Uploaded challan images (gitignored)
+│
+└── frontend/                        # Next.js Admin + Student Dashboard
+    ├── next.config.js
+    ├── package.json
+    ├── tailwind.config.ts
+    │
+    ├── app/                         # Next.js App Router pages
+    │   ├── layout.tsx               # Root layout with font + metadata
+    │   ├── globals.css              # Global Tailwind + custom CSS
+    │   ├── page.tsx                 # Main admin dashboard (charts, analytics, stats)
+    │   │
+    │   ├── login/                   # Admin login page
+    │   ├── register/                # Admin register + OTP email verify
+    │   ├── forgot-password/         # Admin forgot password
+    │   ├── verify/                  # OTP verification page
+    │   │
+    │   ├── students/                # Student list, search, management
+    │   ├── fees/                    # Fee records list
+    │   ├── fee/                     # Individual fee detail + edit
+    │   ├── payments/                # Full payment transaction history
+    │   ├── defaulters/              # Defaulters list + send email alerts
+    │   ├── reports/                 # Report generation + download
+    │   ├── dashboard/               # Admin overview dashboard
+    │   │
+    │   ├── student-login/           # Student OTP login page
+    │   └── student-dashboard/       # Student portal
+    │                                #   - Fee status overview
+    │                                #   - Razorpay payment button
+    │                                #   - Offline challan upload
+    │                                #   - Payment receipt view
+    │                                #   - AI Chat (EduAI powered by Gemini)
+    │
+    ├── components/
+    │   └── Sidebar.tsx              # Collapsible admin navigation sidebar
+    │
+    └── utils/
+        └── api.ts                   # Centralized API fetch utility (base URL config)
 ```
 
 ---
 
-## 3. Database Configuration & Supabase Connection
+## 3. Database Schema (Supabase PostgreSQL)
 
-Both backends utilize the same central **Supabase PostgreSQL database** using the `DATABASE_URL` parameter defined in the `.env` file:
+Both Java and Python backends share the same database via `DATABASE_URL`.
 
-```env
-DATABASE_URL=postgresql://<user>:<password>@<host>:<port>/postgres
-```
-
-### Java Spring Boot Integration
-On start-up, `FeeDefaulterApplication.java` executes a custom `.env` loader that:
-1. Loads the environment variables from the parent directory (`../.env`).
-2. Checks if `DATABASE_URL` is set.
-3. Automatically parses the URL-encoded user credentials (e.g. decoding `@` signs) and formats the JDBC connection string:
-   ```properties
-   spring.datasource.url=jdbc:postgresql://<host>:<port>/postgres?sslmode=require
-   ```
-4. Registers these properties into Spring's active datasource configuration.
-
-### Python Flask Integration
-The Flask backend reads `DATABASE_URL` via `python-dotenv`. It cleans the connection prefix from `postgres://` or `postgresql://` to `postgresql+psycopg2://` as required by SQLAlchemy. If `DATABASE_URL` is missing, it falls back to the local SQLite database (`backend-python/database/db.sqlite3`).
+| Table | Key Columns |
+|---|---|
+| `student` | id, name, roll_no, email, course, branch, year, category |
+| `fee` | id, student_id (FK), total_fee, paid_amount, due_amount, late_fine, deadline, status |
+| `payment` | id, student_id (FK), amount, method, transaction_id, date |
+| `offline_receipt` | id, student_id (FK), file_path, extracted_utr, extracted_amount, extracted_date, ai_confidence, status, upload_date |
+| `admin` | id, username, email, password_hash, otp, otp_expiry |
+| `fee_structure` | id, course, branch, year, amount |
 
 ---
 
-## 4. How to Run the Services
+## 4. n8n Webhook Integration
 
-### Automated Batch Script (Windows)
-To quickly boot the Java backend and the Next.js frontend concurrently, run:
+### Webhook URL: `POST /webhook/fee-otp`
+
+**Payload fields from Python backend:**
+
+| Field | Description |
+|---|---|
+| `email_type` | `otp_verify`, `otp_reset`, `payment_success`, `overdue`, `partial`, `challan_status` |
+| `student_email` | Recipient email |
+| `student_name` | Recipient name |
+| `otp_code` | 6-digit OTP (for OTP emails) |
+| `html_message` | Full HTML email body (for non-OTP emails) |
+| `student_id` | Student database ID |
+| `student_roll` | Roll number |
+| `student_course`, `student_branch`, `student_year` | Academic info |
+| `amount_paid` | Payment amount (for payment_success) |
+| `payment_id` | Receipt ID |
+| `transaction_id` | Razorpay payment ID or manual transaction ID |
+| `payment_method` | `"Razorpay"` or `"Manual"` |
+| `payment_date` | ISO datetime string |
+| `payment_status` | `"Success"` |
+| `fee_total`, `fee_paid`, `fee_due` | Fee breakdown |
+
+### Google Sheets Webhook: `POST /webhook/payment-sheets`
+Set via `N8N_SHEETS_WEBHOOK_URL` env var. Triggered separately by `log_payment_to_sheets()`.
+
+---
+
+## 5. How to Run the Services
+
+### Windows (One-Click)
 ```cmd
 run_project.bat
 ```
+Starts Java (8080) + Next.js (3000) concurrently.
 
-### Manual Steps
-1.  **Frontend**:
-    ```bash
-    cd frontend
-    npm install
-    npm run dev
-    ```
-    Frontend will be available at: http://localhost:3000
+### Manual Setup
 
-2.  **Java Backend**:
-    ```bash
-    cd backend-java
-    mvn spring-boot:run
-    ```
-    Java API will be available at: http://localhost:8080
+```bash
+# Frontend
+cd frontend && npm install && npm run dev
 
-3.  **Python Backend**:
-    Ensure the `venv` is active and requirements are installed:
-    ```bash
-    venv\Scripts\activate
-    pip install -r requirements.txt
-    cd backend-python
-    python app.py
-    ```
-    Python API will be available at: http://localhost:5000
+# Java Backend
+cd backend-java && mvn spring-boot:run
+
+# Python Backend
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+cd backend-python && python app.py
+```
+
+### Service URLs
+| Service | URL |
+|---|---|
+| Next.js Frontend | http://localhost:3000 |
+| Java API | http://localhost:8080 |
+| Python Flask | http://localhost:5000 |
