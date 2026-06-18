@@ -14,3 +14,23 @@ export const getBackendUrl = (path: string = "") => {
   const cleanPath = path.startsWith("/") ? path : `/${path}`;
   return `${baseUrl}${cleanPath}`;
 };
+
+/**
+ * Returns the URL for the Python Flask backend (port 5000).
+ * Used for static files like uploaded receipt images stored in /static/uploads/
+ */
+export const getPythonBackendUrl = (path: string = "") => {
+  let baseUrl = "http://localhost:5000";
+
+  // Use dedicated Python URL env var if set, else fall back to Java URL with port swap
+  if (process.env.NEXT_PUBLIC_PYTHON_API_URL) {
+    baseUrl = process.env.NEXT_PUBLIC_PYTHON_API_URL;
+  } else if (typeof window !== "undefined") {
+    const hostname = window.location.hostname;
+    if (hostname !== "localhost" && !hostname.includes("onrender.com")) {
+      baseUrl = `http://${hostname}:5000`;
+    }
+  }
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  return `${baseUrl}${cleanPath}`;
+};

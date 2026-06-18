@@ -1,5 +1,5 @@
 "use client";
-import { getBackendUrl } from "@/utils/api";
+import { getBackendUrl, getPythonBackendUrl } from "@/utils/api";
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -693,6 +693,9 @@ export default function StudentDashboard() {
                   <p className="text-[#A3AED0] text-sm">
                     Extracting UTR and Amount via Gemini Vision
                   </p>
+                  <p className="text-[#A3AED0] text-xs mt-2">
+                    This may take up to 30 seconds. Please wait...
+                  </p>
                 </div>
               ) : uploadSuccess && ocrData ? (
                 <div className="p-6 bg-[#E6FAF5] border border-[#05CD99]/30 rounded-3xl">
@@ -872,15 +875,15 @@ export default function StudentDashboard() {
                     {/* Challan image preview right */}
                     {r.filePath && (
                       <a
-                        href={getBackendUrl(`${r.filePath}`)}
+                        href={getPythonBackendUrl(`${r.filePath}`)}
                         target="_blank"
                         rel="noreferrer"
                         className="flex-shrink-0 border-2 border-slate-100 rounded-2xl overflow-hidden hover:opacity-90 transition-opacity block"
                       >
                         <img
-                          src={getBackendUrl(`${r.filePath}`)}
+                          src={getPythonBackendUrl(`${r.filePath}`)}
                           alt="Receipt Challan Preview"
-                          className="w-[80px] height-[80px] object-cover"
+                          className="w-[80px] h-[80px] object-cover"
                           onError={(e) => {
                             (e.target as any).src =
                               "https://cdn-icons-png.flaticon.com/512/3342/3342137.png";

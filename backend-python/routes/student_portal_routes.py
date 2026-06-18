@@ -133,9 +133,28 @@ def verify_payment():
             db.session.add(new_payment)
             db.session.commit()
             
-            # 🔥 Send "Thank You" Success Email
-            from services.alert_service import send_payment_success_email
-            send_payment_success_email(student.id, amount_paid, new_payment.id)
+            # 🔥 Send "Thank You" Success Email (with transaction details for Google Sheets)
+            from services.alert_service import send_payment_success_email, log_payment_to_sheets
+            try:
+                send_payment_success_email(
+                    student.id, amount_paid, new_payment.id,
+                    transaction_id=razorpay_payment_id,
+                    payment_method="Razorpay"
+                )
+            except Exception as email_err:
+                print(f"[Email Error] Failed to send success email: {email_err}")
+            
+            # 📊 Log payment to Google Sheets (dedicated call - email se alag)
+            try:
+                log_payment_to_sheets(
+                    student_id=student.id,
+                    amount_paid=amount_paid,
+                    payment_id=new_payment.id,
+                    transaction_id=razorpay_payment_id,
+                    payment_method="Razorpay"
+                )
+            except Exception as sheets_err:
+                print(f"[Sheets Log Error] {sheets_err}")
             
             # Clear session
             session.pop('razorpay_order_id', None)

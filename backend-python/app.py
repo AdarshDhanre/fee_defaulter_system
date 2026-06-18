@@ -6,6 +6,7 @@ for venv_name in [".venv", "venv"]:
         sys.path.insert(0, venv_path)
 
 from flask import Flask
+from flask_cors import CORS
 from extensions import db
 from dotenv import load_dotenv
 
@@ -15,6 +16,9 @@ load_dotenv()
 def create_app():
     app = Flask(__name__)
     
+    # ✅ Enable CORS — allows frontend (port 3000) to load images/APIs from this backend (port 5000)
+    CORS(app, resources={r"/*": {"origins": "*"}})
+
     # Ensure config is loaded first
     app.config.from_pyfile('config.py')
 

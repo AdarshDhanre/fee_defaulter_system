@@ -1,0 +1,318 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "fee-otp",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-1056, 1824],
+      "id": "ba5d2c21-8d7b-4832-a6b7-1fab76d31dd3",
+      "name": "Webhook",
+      "webhookId": "fee-otp-webhook-001"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.email_type }}",
+                    "rightValue": "otp_verify",
+                    "operator": { "type": "string", "operation": "equals" },
+                    "id": "otp-verify-rule"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.email_type }}",
+                    "rightValue": "otp_reset",
+                    "operator": { "type": "string", "operation": "equals" },
+                    "id": "otp-reset-rule"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.email_type }}",
+                    "rightValue": "otp_verify",
+                    "operator": { "type": "string", "operation": "notEquals" },
+                    "id": "not-otp-verify-rule"
+                  },
+                  {
+                    "leftValue": "={{ $json.body.email_type }}",
+                    "rightValue": "otp_reset",
+                    "operator": { "type": "string", "operation": "notEquals" },
+                    "id": "not-otp-reset-rule"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [-768, 1824],
+      "id": "484dd450-0c6d-4841-832c-c10488b7fd10",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.brevo.com/v3/smtp/email",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "api-key", "value": "YOUR_BREVO_API_KEY_HERE" },
+            { "name": "content-type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  \"sender\": {\n    \"name\": \"Fee Defaulter System\",\n    \"email\": \"feedefaultersystem@gmail.com\"\n  },\n  \"to\": [\n    {\n      \"email\": $json.body.student_email,\n      \"name\": $json.body.student_name\n    }\n  ],\n  \"subject\": \"🔐 Your OTP for Fee System\",\n  \"htmlContent\": \"<html><body style='font-family:Arial,sans-serif;background:#f4f7fe;padding:20px;margin:0'><div style='max-width:600px;margin:0 auto;background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08)'><div style='background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:35px 30px;text-align:center'><div style='font-size:48px;margin-bottom:12px'>📧</div><h2 style='margin:0;font-size:26px;font-weight:700'>Verify Your Email</h2><p style='margin-top:8px;opacity:0.9;font-size:15px'>Fee Administration System — Account Verification</p></div><div style='padding:35px 30px;color:#333'><p style='font-size:16px'>Hello <strong>\" + $json.body.student_name + \"</strong>,</p><p style='font-size:15px;color:#555;line-height:1.7'>Thank you for registering! Please use the OTP below to verify your account.</p><div style='background:#f5f3ff;border-left:4px solid #7c5cfc;border-radius:8px;padding:25px;margin:25px 0;text-align:center'><p style='margin:0 0 8px 0;font-size:13px;color:#888;text-transform:uppercase;letter-spacing:2px'>Your OTP Code</p><p style='margin:0;font-size:48px;font-weight:800;color:#4318FF;letter-spacing:12px'>\" + $json.body.otp_code + \"</p><p style='margin:12px 0 0 0;font-size:12px;color:#999'>This OTP is valid for one-time use only.</p></div><p style='font-size:14px;color:#888'>If you did not request this, please ignore this email.</p></div><div style='background:#f8fafc;padding:18px;text-align:center;font-size:12px;color:#888;border-top:1px solid #eee'>This is an automated message from the Fee Administration System.</div></div></body></html>\"\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [-464, 1680],
+      "id": "4eb26087-9168-4863-82be-298fad1744df",
+      "name": "OTP Verify Email"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.brevo.com/v3/smtp/email",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "api-key", "value": "YOUR_BREVO_API_KEY_HERE" },
+            { "name": "content-type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  \"sender\": {\n    \"name\": \"Fee Defaulter System\",\n    \"email\": \"feedefaultersystem@gmail.com\"\n  },\n  \"to\": [\n    {\n      \"email\": $json.body.student_email,\n      \"name\": $json.body.student_name\n    }\n  ],\n  \"subject\": \"🔑 Reset Your Admin Password\",\n  \"htmlContent\": \"<html><body style='font-family:Arial,sans-serif;background:#f4f7fe;padding:20px;margin:0'><div style='max-width:600px;margin:0 auto;background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08)'><div style='background:linear-gradient(135deg,#f43f5e,#e11d48);color:white;padding:35px 30px;text-align:center'><div style='font-size:48px;margin-bottom:12px'>🔑</div><h2 style='margin:0;font-size:26px;font-weight:700'>Password Reset Request</h2><p style='margin-top:8px;opacity:0.9;font-size:15px'>Fee Administration System — Admin Portal</p></div><div style='padding:35px 30px;color:#333'><p style='font-size:16px'>Hello <strong>\" + $json.body.student_name + \"</strong>,</p><p style='font-size:15px;color:#555;line-height:1.7'>You requested to reset your admin password. Use the OTP below on the password reset page.</p><div style='background:#fff1f2;border-left:4px solid #e11d48;border-radius:8px;padding:25px;margin:25px 0;text-align:center'><p style='margin:0 0 8px 0;font-size:13px;color:#888;text-transform:uppercase;letter-spacing:2px'>Password Reset OTP</p><p style='margin:0;font-size:48px;font-weight:800;color:#e11d48;letter-spacing:12px'>\" + $json.body.otp_code + \"</p><p style='margin:12px 0 0 0;font-size:12px;color:#999'>This OTP is valid for one-time use only.</p></div><p style='font-size:14px;color:#e11d48'><strong>⚠️ If you did not request a password reset, please secure your account immediately.</strong></p></div><div style='background:#f8fafc;padding:18px;text-align:center;font-size:12px;color:#888;border-top:1px solid #eee'>This is an automated message from the Fee Administration System.</div></div></body></html>\"\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [-464, 1840],
+      "id": "95aa77bc-c304-4852-9d6d-43db1444b23d",
+      "name": "OTP Reset Email"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.brevo.com/v3/smtp/email",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "api-key", "value": "YOUR_BREVO_API_KEY_HERE" },
+            { "name": "content-type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  \"sender\": {\n    \"name\": \"Fee Defaulter System\",\n    \"email\": \"feedefaultersystem@gmail.com\"\n  },\n  \"to\": [\n    {\n      \"email\": $json.body.student_email,\n      \"name\": $json.body.student_name\n    }\n  ],\n  \"subject\": $json.body.subject,\n  \"htmlContent\": $json.body.html_message\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [-464, 2000],
+      "id": "445fc6d1-5fe1-42f0-956a-42a830a930a1",
+      "name": "Send Backend Generated Email"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"status\": \"success\", \"message\": \"Email sent successfully\" }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [-144, 1840],
+      "id": "b8ee75da-9453-4ef8-a8a9-622e852d51f0",
+      "name": "Respond OK"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.body.email_type }}",
+              "rightValue": "payment_success",
+              "operator": { "type": "string", "operation": "equals" },
+              "id": "payment-success-condition"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [-768, 2160],
+      "id": "4d49d0ee-a4ae-4331-82b2-570398d1cc19",
+      "name": "Is Payment Success?"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1COZFpVNsGw0NslDsOHgb3_-m4hVlYGWwtU_PPL2DzJ8/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1COZFpVNsGw0NslDsOHgb3_-m4hVlYGWwtU_PPL2DzJ8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Student ID":     "={{ $json.body.student_id }}",
+            "Student Name":   "={{ $json.body.student_name }}",
+            "Email":          "={{ $json.body.student_email }}",
+            "Roll No":        "={{ $json.body.student_roll }}",
+            "Course":         "={{ $json.body.student_course }}",
+            "Branch":         "={{ $json.body.student_branch }}",
+            "Year":           "={{ $json.body.student_year }}",
+            "Receipt ID":     "={{ $json.body.payment_id }}",
+            "Amount Paid":    "={{ $json.body.amount_paid }}",
+            "Transaction ID": "={{ $json.body.transaction_id }}",
+            "Payment Method": "={{ $json.body.payment_method }}",
+            "Payment Date":   "={{ $json.body.payment_date }}",
+            "Status":         "={{ $json.body.payment_status }}",
+            "Total Fee":      "={{ $json.body.fee_total }}",
+            "Fee Paid":       "={{ $json.body.fee_paid }}",
+            "Remaining Due":  "={{ $json.body.fee_due }}"
+          },
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [-464, 2192],
+      "id": "0a7567b3-91e9-432d-94a1-02bcf6fc004d",
+      "name": "Google Sheets (Log Payment)",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "cI7X125jzKzdBke3",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"status\": \"success\", \"message\": \"Payment logged to Google Sheets\" }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [-144, 2192],
+      "id": "bee00d59-a297-45fa-b273-9f315f075a32",
+      "name": "Respond Sheets OK"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"status\": \"ok\", \"message\": \"Not a payment event\" }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [-144, 2352],
+      "id": "93d083eb-52c5-4799-adf9-a11d84333d71",
+      "name": "Respond Not Payment"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          { "node": "Switch", "type": "main", "index": 0 },
+          { "node": "Is Payment Success?", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [{ "node": "OTP Verify Email", "type": "main", "index": 0 }],
+        [{ "node": "OTP Reset Email", "type": "main", "index": 0 }],
+        [{ "node": "Send Backend Generated Email", "type": "main", "index": 0 }]
+      ]
+    },
+    "OTP Verify Email": {
+      "main": [[{ "node": "Respond OK", "type": "main", "index": 0 }]]
+    },
+    "OTP Reset Email": {
+      "main": [[{ "node": "Respond OK", "type": "main", "index": 0 }]]
+    },
+    "Send Backend Generated Email": {
+      "main": [[{ "node": "Respond OK", "type": "main", "index": 0 }]]
+    },
+    "Is Payment Success?": {
+      "main": [
+        [{ "node": "Google Sheets (Log Payment)", "type": "main", "index": 0 }],
+        [{ "node": "Respond Not Payment", "type": "main", "index": 0 }]
+      ]
+    },
+    "Google Sheets (Log Payment)": {
+      "main": [[{ "node": "Respond Sheets OK", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0b4b059debcfc8757fb2dd7e8326c33879f1318393a920b46a31e57ab51105b7"
+  }
+}

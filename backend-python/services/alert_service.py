@@ -13,6 +13,78 @@ load_dotenv()
 CONFIG_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'email_config.json')
 
 
+# ============================================================
+# 📊 Google Sheets Payment Logger
+# ============================================================
+def log_payment_to_sheets(student_id, amount_paid, payment_id, transaction_id=None, payment_method=None):
+    """
+    Jab bhi payment successful hoti hai, is function se Google Sheets mein
+    ek dedicated webhook call jata hai.
+    N8N_SHEETS_WEBHOOK_URL environment variable set karo n8n ke Google Sheets webhook ke liye.
+    """
+    sheets_webhook_url = os.environ.get("N8N_SHEETS_WEBHOOK_URL")
+    
+    if not sheets_webhook_url:
+        print("[Sheets Logger] N8N_SHEETS_WEBHOOK_URL not set, skipping Google Sheets log.", flush=True)
+        return False
+
+    try:
+        student = Student.query.get(student_id)
+        fee = Fee.query.filter_by(student_id=student_id).first()
+
+        if not student:
+            print(f"[Sheets Logger] Student {student_id} not found.", flush=True)
+            return False
+
+        from datetime import datetime
+        payload = {
+            # Event type (n8n mein filter ke liye)
+            "event": "payment_success",
+
+            # Student Info
+            "student_id":       student.id,
+            "student_name":     student.name,
+            "student_email":    student.email,
+            "student_roll":     student.roll_no,
+            "student_course":   student.course,
+            "student_branch":   student.branch,
+            "student_year":     student.year,
+            "student_category": student.category,
+
+            # Payment Info
+            "payment_id":       payment_id,
+            "amount_paid":      amount_paid,
+            "transaction_id":   transaction_id or "N/A",
+            "payment_method":   payment_method or "Online",
+            "payment_date":     datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "payment_status":   "Success",
+
+            # Fee Info
+            "fee_total":        fee.total_fee if fee else 0,
+            "fee_paid":         fee.paid_amount if fee else 0,
+            "fee_due":          fee.due_amount if fee else 0,
+            "fee_status":       fee.status if fee else "Unknown",
+        }
+
+        print(f"[Sheets Logger] Sending payment log to Google Sheets webhook...", flush=True)
+        print(f"[Sheets Logger] Payload: {payload}", flush=True)
+
+        res = requests.post(sheets_webhook_url, json=payload, timeout=10)
+
+        if res.status_code in [200, 201]:
+            print(f"[Sheets Logger ✅] Google Sheets log successful! Receipt #{payment_id}", flush=True)
+            return True
+        else:
+            print(f"[Sheets Logger ❌] Webhook returned {res.status_code}: {res.text}", flush=True)
+            return False
+
+    except Exception as e:
+        print(f"[Sheets Logger ❌] Exception: {e}", flush=True)
+        return False
+
+
+
+
 
 # 📌 Load email credentials
 def get_email_credentials():
@@ -45,7 +117,7 @@ def get_student_login_url():
 
 
 # 📧 Send Email Function
-def send_email(receiver_email, subject, message, is_html=True, student=None, fee=None, amount_paid=None, payment_id=None):
+def send_email(receiver_email, subject, message, is_html=True, student=None, fee=None, amount_paid=None, payment_id=None, transaction_id=None, payment_method=None):
     # Check if primary or secondary n8n webhook URL is set
     n8n_primary_url = os.environ.get("N8N_WEBHOOK_URL")
     n8n_secondary_url = os.environ.get("N8N_RENDER_WEBHOOK_URL")
@@ -117,6 +189,8 @@ def send_email(receiver_email, subject, message, is_html=True, student=None, fee
         if student:
             payload["student_id"] = student.id
             payload["student_roll"] = student.roll_no
+            payload["student_name"] = student.name
+            payload["student_email"] = student.email
             payload["student_course"] = student.course
             payload["student_branch"] = student.branch
             payload["student_year"] = student.year
@@ -130,6 +204,16 @@ def send_email(receiver_email, subject, message, is_html=True, student=None, fee
             payload["amount_paid"] = amount_paid
         if payment_id is not None:
             payload["payment_id"] = payment_id
+        if transaction_id is not None:
+            payload["transaction_id"] = transaction_id
+        if payment_method is not None:
+            payload["payment_method"] = payment_method
+        
+        # 📊 Google Sheets logging ke liye extra payment fields (payment_success type ke liye)
+        if email_type == "payment_success" and payment_id is not None:
+            from datetime import datetime
+            payload["payment_date"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            payload["payment_status"] = "Success"
 
         for name, url in webhooks_to_try:
             try:
@@ -328,7 +412,7 @@ def alert_partial_student(student_id):
 
 
 # 📌 Send Payment Success Thank You Email
-def send_payment_success_email(student_id, amount_paid, payment_id):
+def send_payment_success_email(student_id, amount_paid, payment_id, transaction_id=None, payment_method=None):
     student = Student.query.get(student_id)
     fee = Fee.query.filter_by(student_id=student_id).first()
 
@@ -357,6 +441,8 @@ def send_payment_success_email(student_id, amount_paid, payment_id):
                 <div style="background: #ecfdf5; border-left: 4px solid #10b981; padding: 15px; margin: 25px 0;">
                     <p style="margin: 5px 0;"><strong>Receipt ID:</strong> #{payment_id}</p>
                     <p style="margin: 5px 0; font-size: 20px; color: #047857;"><strong>Amount Paid: ₹{amount_paid}</strong></p>
+                    {f'<p style="margin: 5px 0;"><strong>Transaction ID:</strong> {transaction_id}</p>' if transaction_id else ''}
+                    {f'<p style="margin: 5px 0;"><strong>Payment Method:</strong> {payment_method}</p>' if payment_method else ''}
                     <hr style="border: 0; border-top: 1px solid #a7f3d0; margin: 15px 0;">
                     <p style="margin: 5px 0;"><strong>Total Fee:</strong> ₹{fee.total_fee}</p>
                     <p style="margin: 5px 0; font-size: 16px; color: {'#047857' if is_fully_paid else '#333'};">
@@ -379,7 +465,12 @@ def send_payment_success_email(student_id, amount_paid, payment_id):
     </html>
     """
     
-    return send_email(student.email, subject, html_message, is_html=True, student=student, fee=fee, amount_paid=amount_paid, payment_id=payment_id)
+    return send_email(
+        student.email, subject, html_message, is_html=True,
+        student=student, fee=fee,
+        amount_paid=amount_paid, payment_id=payment_id,
+        transaction_id=transaction_id, payment_method=payment_method
+    )
 
 # 📌 Alert All Partial Students
 def alert_all_partials():

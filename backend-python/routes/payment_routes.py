@@ -52,11 +52,27 @@ def pay():
     db.session.commit()
 
     # 🔥 Send Thank You Email (HTML Version)
-    from services.alert_service import send_payment_success_email
+    from services.alert_service import send_payment_success_email, log_payment_to_sheets
     try:
-        send_payment_success_email(student_id, amount, payment.id)
+        send_payment_success_email(
+            student_id, amount, payment.id,
+            transaction_id=payment.transaction_id,
+            payment_method="Manual"
+        )
     except Exception as e:
         print(f"Failed to send email: {e}")
+
+    # 📊 Log payment to Google Sheets (dedicated call)
+    try:
+        log_payment_to_sheets(
+            student_id=student_id,
+            amount_paid=amount,
+            payment_id=payment.id,
+            transaction_id=payment.transaction_id,
+            payment_method="Manual"
+        )
+    except Exception as sheets_err:
+        print(f"[Sheets Log Error] {sheets_err}")
 
     return redirect(url_for("payment.payment_history"))
 
