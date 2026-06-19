@@ -445,7 +445,7 @@ export default function FeeManagement() {
                     )
                   }
                   className="w-full px-5 py-3 bg-[#2a2a40] border border-white/10 rounded-[30px] text-white focus:outline-none focus:ring-2 focus:ring-[#b39ddb]/30 focus:border-[#b39ddb]/50 text-sm placeholder-[#8b8b99]"
-                  placeholder="Defaults to 0"
+                  placeholder=""
                 />
               </div>
 
