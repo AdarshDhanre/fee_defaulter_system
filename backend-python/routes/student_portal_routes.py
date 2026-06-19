@@ -9,11 +9,11 @@ import razorpay
 student_portal_bp = Blueprint('student_portal', __name__, url_prefix='/student')
 
 # ==========================================
-# RAZORPAY TEST CREDENTIALS
+# RAZORPAY CREDENTIALS (set in .env file)
 # Get these from dashboard.razorpay.com -> Settings -> API Keys
 # ==========================================
-RAZORPAY_KEY_ID = "rzp_test_Siz0DM75yKVLRd"
-RAZORPAY_KEY_SECRET = "DK4EXJsSjwq0coBhkEUQjTdf"
+RAZORPAY_KEY_ID = os.environ.get("RAZORPAY_KEY_ID", "rzp_test_Siz0DM75yKVLRd")
+RAZORPAY_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET", "DK4EXJsSjwq0coBhkEUQjTdf")
 
 razorpay_client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
 
@@ -269,9 +269,17 @@ UPLOAD_FOLDER = os.path.join('static', 'uploads', 'receipts')
 
 @student_portal_bp.route("/upload_receipt", methods=["POST"])
 def upload_receipt():
+    # Accept student_id from session (web UI) OR from request body (Next.js API)
     student_id = session.get('student_id')
     if not student_id:
-        return jsonify({"error": "Session expired"}), 401
+        # Try JSON body first, then form data
+        if request.is_json:
+            student_id = request.get_json().get('student_id')
+        else:
+            student_id = request.form.get('student_id')
+    
+    if not student_id:
+        return jsonify({"error": "Session expired or student_id missing"}), 401
         
     if 'receipt' not in request.files:
         return jsonify({"error": "No file uploaded"}), 400

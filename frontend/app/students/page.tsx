@@ -69,7 +69,7 @@ export default function StudentManagement() {
     setEditingStudent(null);
     setName("");
     setRollNo("");
-    setCourse("B.Tech");
+    setCourse("B. Tech");
     setYear("First Year");
     setBranch("Computer Science");
     setCategory("Open");

@@ -880,7 +880,7 @@ export default function StudentDashboard() {
                         <img
                           src={getBackendUrl(`${r.filePath}`)}
                           alt="Receipt Challan Preview"
-                          className="w-[80px] height-[80px] object-cover"
+                          className="w-[80px] h-[80px] object-cover"
                           loading="lazy"
                           onError={(e) => {
                             (e.target as any).src =
@@ -969,7 +969,7 @@ export default function StudentDashboard() {
                           </td>
                           <td className="py-5 text-right">
                             <a
-                              href={`/student-dashboard/receipt/${pay.id}`}
+                              href={getBackendUrl(`/api/student-portal/receipt-pdf/${pay.id}`)}
                               target="_blank"
                               rel="noreferrer"
                               className="inline-flex items-center gap-2 bg-[#F4F7FE] hover:bg-[#4318FF] text-[#4318FF] hover:text-white font-bold text-xs px-5 py-2.5 rounded-xl transition-all"

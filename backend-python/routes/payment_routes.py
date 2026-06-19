@@ -20,7 +20,10 @@ def payment_page():
 @payment_bp.route("/pay", methods=["POST"])
 def pay():
     student_id = request.form["student_id"]
-    amount = int(request.form["amount"])
+    try:
+        amount = int(float(request.form["amount"]))
+    except (ValueError, TypeError):
+        return "❌ Invalid amount provided", 400
 
     # Fee record find karo
     fee = Fee.query.filter_by(student_id=student_id).first()

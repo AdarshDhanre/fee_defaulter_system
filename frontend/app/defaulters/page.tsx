@@ -235,7 +235,13 @@ export default function DefaultersList() {
               </table>
             </div>
           ) : (
-            <div className="text-center py-12 text-slate-500 text-sm font-medium"></div>
+            <div className="text-center py-16 text-slate-500">
+              <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+              </div>
+              <p className="text-sm font-semibold text-emerald-400">All Clear!</p>
+              <p className="text-xs text-slate-500 mt-1">No defaulters found. All students are on track.</p>
+            </div>
           )}
         </section>
       </main>

@@ -65,7 +65,7 @@ export default function FeeManagement() {
   // Form State
   const [selectedStudentId, setSelectedStudentId] = useState("");
   const [totalFee, setTotalFee] = useState<number | "">("");
-  const [paidAmount, setPaidAmount] = useState<number>(0);
+  const [paidAmount, setPaidAmount] = useState<number | "">(0);
   const [deadline, setDeadline] = useState("");
   const [isFetchingFee, setIsFetchingFee] = useState(false);
 
@@ -134,7 +134,7 @@ export default function FeeManagement() {
       await axios.post(getBackendUrl("/api/fees"), {
         student_id: Number(selectedStudentId),
         total_fee: Number(totalFee),
-        paid: Number(paidAmount),
+        paid: paidAmount === "" ? 0 : Number(paidAmount),
         deadline,
       });
 
@@ -439,7 +439,11 @@ export default function FeeManagement() {
                 <input
                   type="number"
                   value={paidAmount}
-                  onChange={(e) => setPaidAmount(Number(e.target.value))}
+                  onChange={(e) =>
+                    setPaidAmount(
+                      e.target.value === "" ? "" : Number(e.target.value),
+                    )
+                  }
                   className="w-full px-5 py-3 bg-[#2a2a40] border border-white/10 rounded-[30px] text-white focus:outline-none focus:ring-2 focus:ring-[#b39ddb]/30 focus:border-[#b39ddb]/50 text-sm placeholder-[#8b8b99]"
                   placeholder="Defaults to 0"
                 />
