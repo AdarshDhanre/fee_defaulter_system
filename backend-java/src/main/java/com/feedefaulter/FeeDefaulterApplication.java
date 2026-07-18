@@ -39,9 +39,31 @@ public class FeeDefaulterApplication {
                     if (credentials.contains(":")) {
                         String[] credParts = credentials.split(":", 2);
                         String decodedUsername = java.net.URLDecoder.decode(credParts[0], java.nio.charset.StandardCharsets.UTF_8);
-                        String decodedPassword = java.net.URLDecoder.decode(credParts[1], java.nio.charset.StandardCharsets.UTF_8);
+                        String rawPassword = credParts[1];
+                        String decodedPassword = java.net.URLDecoder.decode(rawPassword, java.nio.charset.StandardCharsets.UTF_8);
+                        
+                        String jdbcUrl = "jdbc:postgresql://" + connection + "?sslmode=require&prepareThreshold=0";
+                        
+                        // Test connection with decoded password
+                        boolean decodedWorks = false;
+                        try {
+                            // Load driver explicitly just in case
+                            Class.forName("org.postgresql.Driver");
+                            try (java.sql.Connection conn = java.sql.DriverManager.getConnection(jdbcUrl, decodedUsername, decodedPassword)) {
+                                decodedWorks = true;
+                                System.out.println("[INIT] Database connection test succeeded with URL-decoded password.");
+                            }
+                        } catch (Exception e) {
+                            System.out.println("[INIT] Database connection test with URL-decoded password failed: " + e.getMessage());
+                        }
+                        
+                        String finalPassword = decodedWorks ? decodedPassword : rawPassword;
+                        if (!decodedWorks) {
+                            System.out.println("[INIT] Falling back to raw password (preserving literal characters like %40).");
+                        }
+                        
                         System.setProperty("spring.datasource.username", decodedUsername);
-                        System.setProperty("spring.datasource.password", decodedPassword);
+                        System.setProperty("spring.datasource.password", finalPassword);
                     } else {
                         String decodedUsername = java.net.URLDecoder.decode(credentials, java.nio.charset.StandardCharsets.UTF_8);
                         System.setProperty("spring.datasource.username", decodedUsername);

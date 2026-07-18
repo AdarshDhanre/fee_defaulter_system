@@ -11,6 +11,12 @@ export const getBackendUrl = (path: string = "") => {
       baseUrl = `http://${hostname}:8080`;
     }
   }
+
+  // Strip trailing slash if present to prevent double slashes (e.g. //api/auth)
+  if (baseUrl.endsWith("/")) {
+    baseUrl = baseUrl.slice(0, -1);
+  }
+
   const cleanPath = path.startsWith("/") ? path : `/${path}`;
   return `${baseUrl}${cleanPath}`;
 };
@@ -31,6 +37,12 @@ export const getPythonBackendUrl = (path: string = "") => {
       baseUrl = `http://${hostname}:5000`;
     }
   }
+
+  // Strip trailing slash if present to prevent double slashes
+  if (baseUrl.endsWith("/")) {
+    baseUrl = baseUrl.slice(0, -1);
+  }
+
   const cleanPath = path.startsWith("/") ? path : `/${path}`;
   return `${baseUrl}${cleanPath}`;
 };
