@@ -85,185 +85,185 @@ public class AlertService {
     }
 
     public boolean sendEmail(String receiverEmail, String subject, String messageContent, boolean isHtml, Student student, Fee fee, Integer amountPaid, Long paymentId) {
-        String n8nPrimaryUrl = System.getenv("N8N_WEBHOOK_URL");
-        if (n8nPrimaryUrl == null || n8nPrimaryUrl.isEmpty()) {
-            n8nPrimaryUrl = System.getProperty("N8N_WEBHOOK_URL");
-        }
+        new Thread(() -> {
+            String n8nPrimaryUrl = System.getenv("N8N_WEBHOOK_URL");
+            if (n8nPrimaryUrl == null || n8nPrimaryUrl.isEmpty()) {
+                n8nPrimaryUrl = System.getProperty("N8N_WEBHOOK_URL");
+            }
 
-        String n8nSecondaryUrl = System.getenv("N8N_RENDER_WEBHOOK_URL");
-        if (n8nSecondaryUrl == null || n8nSecondaryUrl.isEmpty()) {
-            n8nSecondaryUrl = System.getProperty("N8N_RENDER_WEBHOOK_URL");
-        }
+            String n8nSecondaryUrl = System.getenv("N8N_RENDER_WEBHOOK_URL");
+            if (n8nSecondaryUrl == null || n8nSecondaryUrl.isEmpty()) {
+                n8nSecondaryUrl = System.getProperty("N8N_RENDER_WEBHOOK_URL");
+            }
 
-        java.util.List<java.util.Map.Entry<String, String>> webhooksToTry = new java.util.ArrayList<>();
-        if (n8nPrimaryUrl != null && !n8nPrimaryUrl.isEmpty()) {
-            webhooksToTry.add(new java.util.AbstractMap.SimpleEntry<>("Primary n8n Cloud", n8nPrimaryUrl));
-        }
-        if (n8nSecondaryUrl != null && !n8nSecondaryUrl.isEmpty()) {
-            webhooksToTry.add(new java.util.AbstractMap.SimpleEntry<>("Secondary n8n Render", n8nSecondaryUrl));
-        }
+            java.util.List<java.util.Map.Entry<String, String>> webhooksToTry = new java.util.ArrayList<>();
+            if (n8nPrimaryUrl != null && !n8nPrimaryUrl.isEmpty()) {
+                webhooksToTry.add(new java.util.AbstractMap.SimpleEntry<>("Primary n8n Cloud", n8nPrimaryUrl));
+            }
+            if (n8nSecondaryUrl != null && !n8nSecondaryUrl.isEmpty()) {
+                webhooksToTry.add(new java.util.AbstractMap.SimpleEntry<>("Secondary n8n Render", n8nSecondaryUrl));
+            }
 
-        boolean webhookSuccess = false;
+            boolean webhookSuccess = false;
 
-        if (!webhooksToTry.isEmpty()) {
-            try {
-                // Determine email type based on subject
-                String emailType = "generic";
-                String subjLower = subject.toLowerCase();
-                String studentName = "User";
-                String otpCode = "";
+            if (!webhooksToTry.isEmpty()) {
+                try {
+                    // Determine email type based on subject
+                    String emailType = "generic";
+                    String subjLower = subject.toLowerCase();
+                    String studentName = "User";
+                    String otpCode = "";
 
-                if (subjLower.contains("overdue") || subjLower.contains("payment required")) {
-                    emailType = "overdue";
-                } else if (subjLower.contains("friendly reminder") || subjLower.contains("remaining")) {
-                    emailType = "partial";
-                } else if (subjLower.contains("payment received") || subjLower.contains("successful") || subjLower.contains("fully paid") || subjLower.contains("payment success") || subjLower.contains("success")) {
-                    emailType = "payment_success";
-                } else if (subjLower.contains("challan") || subjLower.contains("receipt")) {
-                    emailType = "challan_status";
-                } else if (subjLower.contains("otp for fee system")) {
-                    emailType = "otp_verify";
-                } else if (subjLower.contains("reset your admin password")) {
-                    emailType = "otp_reset";
-                }
+                    if (subjLower.contains("overdue") || subjLower.contains("payment required")) {
+                        emailType = "overdue";
+                    } else if (subjLower.contains("friendly reminder") || subjLower.contains("remaining")) {
+                        emailType = "partial";
+                    } else if (subjLower.contains("payment received") || subjLower.contains("successful") || subjLower.contains("fully paid") || subjLower.contains("payment success") || subjLower.contains("success")) {
+                        emailType = "payment_success";
+                    } else if (subjLower.contains("challan") || subjLower.contains("receipt")) {
+                        emailType = "challan_status";
+                    } else if (subjLower.contains("otp for fee system")) {
+                        emailType = "otp_verify";
+                    } else if (subjLower.contains("reset your admin password")) {
+                        emailType = "otp_reset";
+                    }
 
-                // Extract OTP and name for verification/reset if plain text
-                if ("otp_verify".equals(emailType) || "otp_reset".equals(emailType)) {
-                    try {
-                        String[] lines = messageContent.split("\n");
-                        if (lines.length > 0 && lines[0].startsWith("Hello ")) {
-                            studentName = lines[0].substring(6).replace(",", "").trim();
+                    // Extract OTP and name for verification/reset if plain text
+                    if ("otp_verify".equals(emailType) || "otp_reset".equals(emailType)) {
+                        try {
+                            String[] lines = messageContent.split("\n");
+                            if (lines.length > 0 && lines[0].startsWith("Hello ")) {
+                                studentName = lines[0].substring(6).replace(",", "").trim();
+                            }
+                            java.util.regex.Pattern p = java.util.regex.Pattern.compile("\\b\\d{6}\\b");
+                            for (String line : lines) {
+                                java.util.regex.Matcher m = p.matcher(line);
+                                if (m.find()) {
+                                    otpCode = m.group(0);
+                                    break;
+                                }
+                            }
+                        } catch (Exception e) {
+                            // ignore parsing errors
                         }
-                        java.util.regex.Pattern p = java.util.regex.Pattern.compile("\\b\\d{6}\\b");
-                        for (String line : lines) {
-                            java.util.regex.Matcher m = p.matcher(line);
+                    }
+
+                    // Extract student name from HTML if Dear <strong>Name</strong> is present
+                    String htmlContent = messageContent;
+                    if (!isHtml) {
+                        htmlContent = "<p>" + messageContent.replace("\n", "<br>") + "</p>";
+                    } else {
+                        if ("User".equals(studentName)) {
+                            java.util.regex.Pattern p = java.util.regex.Pattern.compile("Dear <strong>(.*?)</strong>", java.util.regex.Pattern.CASE_INSENSITIVE);
+                            java.util.regex.Matcher m = p.matcher(messageContent);
                             if (m.find()) {
-                                otpCode = m.group(0);
-                                break;
+                                studentName = m.group(1);
                             }
                         }
-                    } catch (Exception e) {
-                        // ignore parsing errors
                     }
-                }
 
-                // Extract student name from HTML if Dear <strong>Name</strong> is present
-                String htmlContent = messageContent;
-                if (!isHtml) {
-                    htmlContent = "<p>" + messageContent.replace("\n", "<br>") + "</p>";
-                } else {
-                    if ("User".equals(studentName)) {
-                        java.util.regex.Pattern p = java.util.regex.Pattern.compile("Dear <strong>(.*?)</strong>", java.util.regex.Pattern.CASE_INSENSITIVE);
-                        java.util.regex.Matcher m = p.matcher(messageContent);
-                        if (m.find()) {
-                            studentName = m.group(1);
+                    // Construct JSON payload
+                    ObjectMapper mapper = new ObjectMapper();
+                    java.util.Map<String, Object> payload = new java.util.HashMap<>();
+                    payload.put("email_type", emailType);
+                    payload.put("student_email", receiverEmail);
+                    payload.put("student_name", studentName);
+                    payload.put("subject", subject);
+                    payload.put("html_message", htmlContent);
+                    payload.put("otp_code", otpCode);
+
+                    if (student != null) {
+                        payload.put("student_id", student.getId());
+                        payload.put("student_roll", student.getRollNo());
+                        payload.put("student_course", student.getCourse());
+                        payload.put("student_branch", student.getBranch());
+                        payload.put("student_year", student.getYear());
+                        payload.put("student_category", student.getCategory());
+                    }
+                    if (fee != null) {
+                        payload.put("fee_total", fee.getTotalFee());
+                        payload.put("fee_paid", fee.getPaidAmount());
+                        payload.put("fee_due", fee.getDueAmount());
+                        payload.put("fee_status", fee.getStatus());
+                    }
+                    if (amountPaid != null) {
+                        payload.put("amount_paid", amountPaid);
+                    }
+                    if (paymentId != null) {
+                        payload.put("payment_id", paymentId);
+                    }
+
+                    String jsonPayload = mapper.writeValueAsString(payload);
+
+                    for (java.util.Map.Entry<String, String> webhook : webhooksToTry) {
+                        String name = webhook.getKey();
+                        String urlString = webhook.getValue();
+                        try {
+                            System.out.println("[" + name + "] Java sending email via webhook to: " + urlString + " (Type: " + emailType + ")");
+                            
+                            java.net.URL url = new java.net.URL(urlString);
+                            java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
+                            conn.setRequestMethod("POST");
+                            conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+                            conn.setRequestProperty("Accept", "application/json");
+                            conn.setDoOutput(true);
+                            conn.setConnectTimeout(5000);
+                            conn.setReadTimeout(5000);
+
+                            try (java.io.OutputStream os = conn.getOutputStream()) {
+                                byte[] input = jsonPayload.getBytes("utf-8");
+                                os.write(input, 0, input.length);
+                            }
+
+                            int code = conn.getResponseCode();
+                            if (code >= 200 && code < 300) {
+                                System.out.println("[" + name + " Success] Java email webhook triggered successfully!");
+                                webhookSuccess = true;
+                                break;
+                            } else {
+                                System.err.println("[" + name + " Error] Webhook returned status code: " + code);
+                            }
+                        } catch (Exception e) {
+                            System.err.println("[" + name + " Exception] Java failed to trigger webhook: " + e.getMessage());
                         }
                     }
+                } catch (Exception e) {
+                    System.err.println("[Error] JSON serialization or extraction failed: " + e.getMessage());
                 }
+            }
 
-                // Construct JSON payload
-                ObjectMapper mapper = new ObjectMapper();
-                java.util.Map<String, Object> payload = new java.util.HashMap<>();
-                payload.put("email_type", emailType);
-                payload.put("student_email", receiverEmail);
-                payload.put("student_name", studentName);
-                payload.put("subject", subject);
-                payload.put("html_message", htmlContent);
-                payload.put("otp_code", otpCode);
+            if (webhookSuccess) {
+                return;
+            }
 
-                if (student != null) {
-                    payload.put("student_id", student.getId());
-                    payload.put("student_roll", student.getRollNo());
-                    payload.put("student_course", student.getCourse());
-                    payload.put("student_branch", student.getBranch());
-                    payload.put("student_year", student.getYear());
-                    payload.put("student_category", student.getCategory());
-                }
-                if (fee != null) {
-                    payload.put("fee_total", fee.getTotalFee());
-                    payload.put("fee_paid", fee.getPaidAmount());
-                    payload.put("fee_due", fee.getDueAmount());
-                    payload.put("fee_status", fee.getStatus());
-                }
-                if (amountPaid != null) {
-                    payload.put("amount_paid", amountPaid);
-                }
-                if (paymentId != null) {
-                    payload.put("payment_id", paymentId);
-                }
+            if (!isConfigured) {
+                System.out.println("============================================================");
+                System.out.println("[SIMULATED EMAIL]");
+                System.out.println("TO: " + receiverEmail);
+                System.out.println("SUBJECT: " + subject);
+                System.out.println("CONTENT: " + messageContent.substring(0, Math.min(200, messageContent.length())) + "...");
+                System.out.println("============================================================");
+                return;
+            }
 
-                String jsonPayload = mapper.writeValueAsString(payload);
+            try {
+                MimeMessage mimeMessage = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+                helper.setText(messageContent, isHtml);
+                helper.setTo(receiverEmail);
+                helper.setSubject(subject);
+                helper.setFrom(senderEmail);
 
-                for (java.util.Map.Entry<String, String> webhook : webhooksToTry) {
-                    String name = webhook.getKey();
-                    String urlString = webhook.getValue();
-                    try {
-                        System.out.println("[" + name + "] Java sending email via webhook to: " + urlString + " (Type: " + emailType + ")");
-                        
-                        java.net.URL url = new java.net.URL(urlString);
-                        java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
-                        conn.setRequestMethod("POST");
-                        conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-                        conn.setRequestProperty("Accept", "application/json");
-                        conn.setDoOutput(true);
-                        conn.setConnectTimeout(5000);
-                        conn.setReadTimeout(5000);
-
-                        try (java.io.OutputStream os = conn.getOutputStream()) {
-                            byte[] input = jsonPayload.getBytes("utf-8");
-                            os.write(input, 0, input.length);
-                        }
-
-                        int code = conn.getResponseCode();
-                        if (code >= 200 && code < 300) {
-                            System.out.println("[" + name + " Success] Java email webhook triggered successfully!");
-                            webhookSuccess = true;
-                            break;
-                        } else {
-                            System.err.println("[" + name + " Error] Webhook returned status code: " + code);
-                        }
-                    } catch (Exception e) {
-                        System.err.println("[" + name + " Exception] Java failed to trigger webhook: " + e.getMessage());
-                    }
-                }
+                mailSender.send(mimeMessage);
+                System.out.println("[SUCCESS] Email sent to " + receiverEmail);
             } catch (Exception e) {
-                System.err.println("[Error] JSON serialization or extraction failed: " + e.getMessage());
+                System.err.println("[ERROR] Email sending failed: " + e.getMessage());
+                if (e.getMessage() != null && (e.getMessage().contains("Connection timed out") || e.getMessage().contains("Couldn't connect to host"))) {
+                    System.err.println("[NOTE] Outbound SMTP ports (587, 465, 25) are blocked by default on cloud hosting providers like Render. If you are deployed on Render, please make sure your n8n service is configured correctly (so that Java uses Webhook rather than falling back to SMTP), or run the Java backend locally.");
+                }
             }
-        }
-
-        if (webhookSuccess) {
-            return true;
-        }
-
-
-        if (!isConfigured) {
-            System.out.println("============================================================");
-            System.out.println("[SIMULATED EMAIL]");
-            System.out.println("TO: " + receiverEmail);
-            System.out.println("SUBJECT: " + subject);
-            System.out.println("CONTENT: " + messageContent.substring(0, Math.min(200, messageContent.length())) + "...");
-            System.out.println("============================================================");
-            return true;
-        }
-
-        try {
-            MimeMessage mimeMessage = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
-            helper.setText(messageContent, isHtml);
-            helper.setTo(receiverEmail);
-            helper.setSubject(subject);
-            helper.setFrom(senderEmail);
-
-            mailSender.send(mimeMessage);
-            System.out.println("[SUCCESS] Email sent to " + receiverEmail);
-            return true;
-        } catch (Exception e) {
-            System.err.println("[ERROR] Email sending failed: " + e.getMessage());
-            if (e.getMessage() != null && (e.getMessage().contains("Connection timed out") || e.getMessage().contains("Couldn't connect to host"))) {
-                System.err.println("[NOTE] Outbound SMTP ports (587, 465, 25) are blocked by default on cloud hosting providers like Render. If you are deployed on Render, please make sure your n8n service is configured correctly (so that Java uses Webhook rather than falling back to SMTP), or run the Java backend locally.");
-            }
-            return false;
-        }
+        }).start();
+        return true;
     }
 
     public boolean alertStudent(Student student, Fee fee) {
