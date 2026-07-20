@@ -31,7 +31,7 @@ def login():
                 if admin.lockout_until > now:
                     remaining_secs = int((admin.lockout_until - now).total_seconds())
                     remaining_mins = max(1, (remaining_secs + 59) // 60)
-                    return render_template("login.html", error=f"Account is locked due to 5 failed attempts! Try again in {remaining_mins} minute(s).")
+                    return render_template("login.html", error=f"Account is locked due to 5 unsuccessful login attempts! Try again in {remaining_mins} minute(s) or reset your password.")
                 else:
                     # Lockout period expired
                     admin.lockout_until = None
@@ -56,11 +56,11 @@ def login():
                 if current_attempts >= 5:
                     admin.lockout_until = datetime.now() + timedelta(minutes=15)
                     db.session.commit()
-                    return render_template("login.html", error="Too many failed login attempts! Account is locked for 15 minutes.")
+                    return render_template("login.html", error="You have reached 5 unsuccessful login attempts! Account is locked for 15 minutes.")
                 else:
                     db.session.commit()
                     remaining = 5 - current_attempts
-                    return render_template("login.html", error=f"Invalid username or password! {remaining} attempt(s) remaining before 15-min lockout.")
+                    return render_template("login.html", error=f"Invalid username or password! You have {current_attempts} unsuccessful attempt(s). {remaining} attempt(s) remaining before 15-min lockout.")
 
         return render_template("login.html", error="Invalid username or password!")
 
