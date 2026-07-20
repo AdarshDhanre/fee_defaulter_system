@@ -215,6 +215,8 @@
             </script>
             {% endif %}
 
+            <div class="alert alert-danger alert-custom" role="alert" id="js-error-alert" style="display: none;"></div>
+
             <form method="POST" id="registerForm">
                 <div class="input-group-custom">
                     <i class="bi bi-person"></i>
@@ -228,7 +230,15 @@
 
                 <div class="input-group-custom">
                     <i class="bi bi-lock"></i>
-                    <input type="password" name="password" class="form-control" placeholder="Create Password" required minlength="6">
+                    <input type="password" name="password" id="passwordInput" class="form-control" placeholder="Create Password" required minlength="6">
+                </div>
+
+                <!-- Password Guidance Box -->
+                <div class="p-2 mb-3 text-start" style="background: rgba(24, 24, 38, 0.8); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.75rem; color: #b39ddb;">
+                    <div style="font-weight: 500; margin-bottom: 3px;">Password Requirements:</div>
+                    <div id="reqCapital">• First letter MUST be Capital (A-Z)</div>
+                    <div id="reqSpecial">• Contains at least 1 Special Char (@, #, $, etc.)</div>
+                    <div id="reqLength">• Minimum 6 characters long</div>
                 </div>
 
                 <button class="btn btn-login" type="submit" id="submitBtn">
@@ -245,8 +255,57 @@
 </div>
 
 <script>
-    // Loading state on submit
+    const passInput = document.getElementById('passwordInput');
+    const reqCap = document.getElementById('reqCapital');
+    const reqSpec = document.getElementById('reqSpecial');
+    const reqLen = document.getElementById('reqLength');
+    const jsError = document.getElementById('js-error-alert');
+
+    passInput.addEventListener('input', function() {
+        const val = this.value;
+        const hasCap = /^[A-Z]/.test(val);
+        const hasSpec = /[^a-zA-Z0-9]/.test(val);
+        const hasLen = val.length >= 6;
+
+        reqCap.style.color = hasCap ? '#34d399' : '#b39ddb';
+        reqCap.innerText = (hasCap ? '✓ ' : '• ') + 'First letter MUST be Capital (A-Z)';
+
+        reqSpec.style.color = hasSpec ? '#34d399' : '#b39ddb';
+        reqSpec.innerText = (hasSpec ? '✓ ' : '• ') + 'Contains at least 1 Special Char (@, #, $, etc.)';
+
+        reqLen.style.color = hasLen ? '#34d399' : '#b39ddb';
+        reqLen.innerText = (hasLen ? '✓ ' : '• ') + 'Minimum 6 characters long';
+    });
+
     document.getElementById('registerForm').addEventListener('submit', function(e) {
+        const val = passInput.value;
+        const hasCap = /^[A-Z]/.test(val);
+        const hasSpec = /[^a-zA-Z0-9]/.test(val);
+        const hasLen = val.length >= 6;
+
+        if (!hasCap) {
+            e.preventDefault();
+            jsError.innerText = "Password must start with a Capital letter (A-Z)!";
+            jsError.style.display = 'block';
+            return;
+        }
+
+        if (!hasSpec) {
+            e.preventDefault();
+            jsError.innerText = "Password must contain at least one special character!";
+            jsError.style.display = 'block';
+            return;
+        }
+
+        if (!hasLen) {
+            e.preventDefault();
+            jsError.innerText = "Password must be at least 6 characters long!";
+            jsError.style.display = 'block';
+            return;
+        }
+
+        jsError.style.display = 'none';
+
         if(this.checkValidity()) {
             const btn = document.getElementById('submitBtn');
             btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending OTP...';

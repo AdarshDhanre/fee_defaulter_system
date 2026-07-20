@@ -99,6 +99,18 @@ public class AuthController {
         return ResponseEntity.status(401).body(response);
     }
 
+    private boolean isValidPassword(String password) {
+        if (password == null || password.length() < 6) {
+            return false;
+        }
+        // First letter must be uppercase (A-Z)
+        if (!Character.isUpperCase(password.charAt(0))) {
+            return false;
+        }
+        // Must contain at least one special character
+        return java.util.regex.Pattern.compile("[^a-zA-Z0-9]").matcher(password).find();
+    }
+
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> register(@RequestBody Map<String, String> body) {
         String username = body.get("username");
@@ -106,6 +118,11 @@ public class AuthController {
         String password = body.get("password");
 
         Map<String, Object> response = new HashMap<>();
+
+        if (!isValidPassword(password)) {
+            response.put("error", "Password must start with a Capital letter (A-Z) and contain at least 1 special character!");
+            return ResponseEntity.status(400).body(response);
+        }
 
         if (adminRepository.findByUsername(username).isPresent() || adminRepository.findByEmail(email).isPresent()) {
             response.put("error", "Username or Email already exists!");
@@ -191,6 +208,12 @@ public class AuthController {
         String password = body.get("password");
 
         Map<String, Object> response = new HashMap<>();
+
+        if (!isValidPassword(password)) {
+            response.put("error", "Password must start with a Capital letter (A-Z) and contain at least 1 special character!");
+            return ResponseEntity.status(400).body(response);
+        }
+
         Optional<Admin> adminOpt = adminRepository.findByEmail(email);
 
         if (adminOpt.isPresent()) {

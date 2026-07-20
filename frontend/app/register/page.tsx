@@ -14,9 +14,29 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const hasFirstCapital = /^[A-Z]/.test(password);
+  const hasSpecialChar = /[^a-zA-Z0-9]/.test(password);
+  const hasMinLength = password.length >= 6;
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (!hasFirstCapital) {
+      setError("Password must start with a Capital letter (A-Z)!");
+      return;
+    }
+
+    if (!hasSpecialChar) {
+      setError("Password must contain at least one special character (e.g. @, #, $, %)!");
+      return;
+    }
+
+    if (!hasMinLength) {
+      setError("Password must be at least 6 characters long!");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -39,7 +59,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#6b52d1] via-[#b862c9] to-[#f77c8e] font-poppins p-4">
       {/* login-card container matching the original */}
-      <div className="w-[900px] max-w-[95%] h-auto md:h-[550px] flex flex-col md:flex-row bg-[#1e1e2f]/95 backdrop-blur-[10px] rounded-[15px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden border border-white/10 transition-all animate-in fade-in duration-200">
+      <div className="w-[900px] max-w-[95%] h-auto md:min-h-[550px] flex flex-col md:flex-row bg-[#1e1e2f]/95 backdrop-blur-[10px] rounded-[15px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden border border-white/10 transition-all animate-in fade-in duration-200">
         {/* Left Side: College Logo container with margin and white bg */}
         <div
           className="hidden md:block flex-1 bg-white m-[30px] rounded-[15px] bg-center bg-no-repeat bg-contain"
@@ -99,6 +119,25 @@ export default function RegisterPage() {
                   minLength={6}
                 />
               </div>
+
+              {/* Password Requirement Guidance Card */}
+              {password.length > 0 && (
+                <div className="p-3 bg-[#181826]/80 rounded-xl border border-white/10 text-[11px] space-y-1.5 transition-all">
+                  <p className="text-[#b39ddb] font-medium mb-1">Password Requirements:</p>
+                  <div className={`flex items-center gap-2 ${hasFirstCapital ? "text-emerald-400 font-medium" : "text-gray-400"}`}>
+                    <span>{hasFirstCapital ? "✓" : "•"}</span>
+                    <span>First letter MUST be Capital (A-Z)</span>
+                  </div>
+                  <div className={`flex items-center gap-2 ${hasSpecialChar ? "text-emerald-400 font-medium" : "text-gray-400"}`}>
+                    <span>{hasSpecialChar ? "✓" : "•"}</span>
+                    <span>Contains at least 1 Special Char (@, #, $, etc.)</span>
+                  </div>
+                  <div className={`flex items-center gap-2 ${hasMinLength ? "text-emerald-400 font-medium" : "text-gray-400"}`}>
+                    <span>{hasMinLength ? "✓" : "•"}</span>
+                    <span>At least 6 characters long</span>
+                  </div>
+                </div>
+              )}
 
               <button
                 type="submit"

@@ -2,9 +2,19 @@ from flask import Blueprint, render_template, request, redirect, session
 from models.admin_model import Admin
 from extensions import db
 import random
+import re
 from services.alert_service import send_email
 
 auth_bp = Blueprint('auth', __name__)
+
+def validate_password_strength(password):
+    if not password or len(password) < 6:
+        return False, "Password must be at least 6 characters long!"
+    if not password[0].isupper():
+        return False, "Password must start with a Capital letter (A-Z)!"
+    if not re.search(r'[^a-zA-Z0-9]', password):
+        return False, "Password must contain at least one special character (e.g. @, #, $, %)!"
+    return True, None
 
 @auth_bp.route("/", methods=["GET", "POST"])
 def login():
@@ -49,6 +59,10 @@ def register():
         email = request.form["email"]
         password = request.form["password"]
         
+        is_valid, pwd_err = validate_password_strength(password)
+        if not is_valid:
+            return render_template("register.html", error=pwd_err)
+
         if Admin.query.filter_by(username=username).first() or Admin.query.filter_by(email=email).first():
             return render_template("register.html", error="Username or Email already exists!")
             
@@ -139,6 +153,10 @@ def reset_password():
         
         if password != confirm_password:
             return render_template("reset_password.html", email=email, error="Passwords do not match!")
+
+        is_valid, pwd_err = validate_password_strength(password)
+        if not is_valid:
+            return render_template("reset_password.html", email=email, error=pwd_err)
             
         admin = Admin.query.filter_by(email=email).first()
         if admin and admin.otp == otp_entered:
@@ -151,3 +169,4 @@ def reset_password():
             return render_template("reset_password.html", email=email, error="Invalid OTP! Please try again.")
             
     return render_template("reset_password.html", email=email)
+
