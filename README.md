@@ -16,7 +16,7 @@ A robust, enterprise-grade **Fee Defaulter Management & Automated Alerting Syste
 | **OCR / AI** | Google Gemini 2.5 Flash (`google-genai` SDK) |
 | **Email Automation** | n8n + Brevo (Sendinblue) SMTP API |
 | **Payment Logging** | Google Sheets via n8n Webhook |
-| **Auth** | OTP-based email verification (Admin + Student) |
+| **Auth & Security** | OTP-based email verification, Brute-Force Rate-Limiting (5 attempts / 15-min lockout), Capital+Special Char Password Policy |
 
 ---
 
@@ -74,17 +74,19 @@ graph TD
 - Student data + payment info auto-appended to Google Sheets in real time
 - Columns logged: Student ID, Name, Email, Roll No, Course, Branch, Year, Receipt ID, Amount Paid, Transaction ID, Payment Method, Payment Date, Status, Total Fee, Fee Paid, Remaining Due
 
-### 5. 📧 Automated Email Notification Engine
-Rich HTML email templates sent automatically via **n8n + Brevo**:
+### 6. 🛡️ Brute-Force Rate Limiting & Account Lockout (NEW)
+- **Attempt Limit**: Maximum 5 consecutive unsuccessful login attempts allowed per admin account
+- **15-Min Lockout**: On the 5th unsuccessful attempt, the account is automatically locked out for 15 minutes with HTTP 429 response
+- **Live User Guidance**: Clear feedback showing remaining attempts (`You have X unsuccessful attempt(s). Y attempt(s) remaining...`)
+- **Auto-Reset & Fail-safe**: Successful login resets attempt counter to 0; built-in in-memory fallback rate limiter ensures high availability with zero 500 server errors
+- **Automatic Schema Migration**: `DatabaseInitializer` auto-adds `failed_attempts` and `lockout_until` columns to the DB on backend startup
 
-| Email Type | Trigger |
-|---|---|
-| 🔐 OTP Verify | Student/Admin registration |
-| 🔑 OTP Reset | Admin password reset |
-| 🚨 Fee Overdue Alert | Cron job / admin manual trigger |
-| 🔔 Partial Payment Reminder | Admin manual trigger |
-| ✅ Payment Success Receipt | After every successful payment |
-| ✅/❌ Challan Status | After admin approves/rejects challan |
+### 7. 🔑 Advanced Admin Password Policy (NEW)
+- **First Letter Capital (`A-Z`)**: Password must begin with an uppercase letter
+- **Special Character**: Must contain at least one special character (`@`, `#`, `$`, `%`, `!`, `&`, `*`, etc.)
+- **Minimum 6 Characters**: Standard password length requirement
+- **Interactive UI Feedback**: Real-time requirement guidance checklist with live checkmarks (`✓`) on Next.js frontend & HTML templates
+- **Dual Backend Enforcement**: Enforced across Java Spring Boot & Python Flask auth APIs
 
 ---
 
