@@ -170,7 +170,6 @@ public class AuthController {
             return ResponseEntity.status(401).body(response);
         }
     }
-    }
 
     @PostMapping("/student-login")
     public ResponseEntity<Map<String, Object>> studentLogin(@RequestBody Map<String, String> credentials) {
