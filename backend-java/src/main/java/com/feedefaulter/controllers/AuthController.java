@@ -26,6 +26,7 @@ public class AuthController {
     private final StudentRepository studentRepository;
     private final AlertService alertService;
     private final PasswordEncoder passwordEncoder;
+    private final Random random = new Random();
     private static final Map<String, Integer> inMemoryFailedAttempts = new java.util.concurrent.ConcurrentHashMap<>();
     private static final Map<String, LocalDateTime> inMemoryLockoutUntil = new java.util.concurrent.ConcurrentHashMap<>();
 
