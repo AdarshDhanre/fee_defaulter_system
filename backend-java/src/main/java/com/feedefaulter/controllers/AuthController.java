@@ -31,30 +31,32 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> credentials) {
-        String username = credentials != null ? credentials.get("username") : null;
-        String password = credentials != null ? credentials.get("password") : null;
-
         Map<String, Object> response = new HashMap<>();
 
-        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
-            response.put("error", "Username and password are required!");
-            return ResponseEntity.status(400).body(response);
-        }
-
-        Optional<Admin> adminOpt = Optional.empty();
         try {
-            adminOpt = adminRepository.findByUsername(username);
-        } catch (Exception e) {
-            System.err.println("[WARN] Database query failed: " + e.getMessage());
-        }
+            String username = credentials != null ? credentials.get("username") : null;
+            String password = credentials != null ? credentials.get("password") : null;
 
-        if (adminOpt.isPresent()) {
-            Admin admin = adminOpt.get();
+            if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
+                response.put("error", "Username and password are required!");
+                return ResponseEntity.status(400).body(response);
+            }
 
-            // 1. Check if account is locked out (from DB or in-memory fallback)
-            LocalDateTime lockoutTime = admin.getLockoutUntil();
-            if (lockoutTime == null) {
-                lockoutTime = inMemoryLockoutUntil.get(username.toLowerCase());
+            String userKey = username.trim().toLowerCase();
+
+            // 1. Check if username is locked out (from DB or in-memory fallback)
+            Optional<Admin> adminOpt = Optional.empty();
+            try {
+                adminOpt = adminRepository.findByUsername(username.trim());
+            } catch (Exception e) {
+                System.err.println("[WARN] Database findByUsername failed: " + e.getMessage());
+            }
+
+            LocalDateTime lockoutTime = inMemoryLockoutUntil.get(userKey);
+            if (lockoutTime == null && adminOpt.isPresent()) {
+                try {
+                    lockoutTime = adminOpt.get().getLockoutUntil();
+                } catch (Exception ignored) {}
             }
 
             if (lockoutTime != null) {
@@ -65,30 +67,48 @@ public class AuthController {
                     return ResponseEntity.status(429).body(response);
                 } else {
                     // Lockout period expired
-                    admin.setLockoutUntil(null);
-                    admin.setFailedAttempts(0);
-                    inMemoryLockoutUntil.remove(username.toLowerCase());
-                    inMemoryFailedAttempts.remove(username.toLowerCase());
-                    try { adminRepository.save(admin); } catch (Exception ignored) {}
+                    inMemoryLockoutUntil.remove(userKey);
+                    inMemoryFailedAttempts.remove(userKey);
+                    if (adminOpt.isPresent()) {
+                        Admin admin = adminOpt.get();
+                        admin.setLockoutUntil(null);
+                        admin.setFailedAttempts(0);
+                        try { adminRepository.save(admin); } catch (Exception ignored) {}
+                    }
                 }
             }
 
-            boolean matches = passwordEncoder.matches(password, admin.getPassword());
+            // 2. Check credentials safely
+            boolean matches = false;
             boolean isWerkzeug = false;
 
-            if (!matches) {
-                if (com.feedefaulter.utils.WerkzeugPasswordEncoder.checkPassword(password, admin.getPassword())) {
-                    matches = true;
-                    isWerkzeug = true;
+            if (adminOpt.isPresent()) {
+                Admin admin = adminOpt.get();
+                String dbPass = admin.getPassword();
+                if (dbPass != null) {
+                    try {
+                        matches = passwordEncoder.matches(password, dbPass);
+                    } catch (Exception ignored) {}
+
+                    if (!matches) {
+                        try {
+                            if (com.feedefaulter.utils.WerkzeugPasswordEncoder.checkPassword(password, dbPass)) {
+                                matches = true;
+                                isWerkzeug = true;
+                            }
+                        } catch (Exception ignored) {}
+                    }
                 }
             }
 
-            if (matches) {
+            // 3. Handle Login Success vs Failure
+            if (matches && adminOpt.isPresent()) {
+                Admin admin = adminOpt.get();
                 // Successful login -> Reset failed attempts
+                inMemoryFailedAttempts.remove(userKey);
+                inMemoryLockoutUntil.remove(userKey);
                 admin.setFailedAttempts(0);
                 admin.setLockoutUntil(null);
-                inMemoryFailedAttempts.remove(username.toLowerCase());
-                inMemoryLockoutUntil.remove(username.toLowerCase());
 
                 if (Boolean.FALSE.equals(admin.getIsVerified())) {
                     try { adminRepository.save(admin); } catch (Exception ignored) {}
@@ -101,9 +121,7 @@ public class AuthController {
                     try {
                         admin.setPassword(passwordEncoder.encode(password));
                         System.out.println("[INFO] Upgraded admin '" + admin.getUsername() + "' password hash from Werkzeug to BCrypt.");
-                    } catch (Exception e) {
-                        System.err.println("[WARN] Failed to upgrade Werkzeug password hash to BCrypt: " + e.getMessage());
-                    }
+                    } catch (Exception ignored) {}
                 }
 
                 try { adminRepository.save(admin); } catch (Exception ignored) {}
@@ -114,33 +132,44 @@ public class AuthController {
                 response.put("id", admin.getId());
                 return ResponseEntity.ok(response);
             } else {
-                // Increment failed attempts
-                int dbAttempts = admin.getFailedAttempts() != null ? admin.getFailedAttempts() : 0;
-                int memAttempts = inMemoryFailedAttempts.getOrDefault(username.toLowerCase(), 0);
+                // Unsuccessful login attempt
+                int dbAttempts = 0;
+                if (adminOpt.isPresent()) {
+                    try {
+                        dbAttempts = adminOpt.get().getFailedAttempts() != null ? adminOpt.get().getFailedAttempts() : 0;
+                    } catch (Exception ignored) {}
+                }
+                int memAttempts = inMemoryFailedAttempts.getOrDefault(userKey, 0);
                 int currentAttempts = Math.max(dbAttempts, memAttempts) + 1;
 
-                inMemoryFailedAttempts.put(username.toLowerCase(), currentAttempts);
-                admin.setFailedAttempts(currentAttempts);
+                inMemoryFailedAttempts.put(userKey, currentAttempts);
+
+                if (adminOpt.isPresent()) {
+                    Admin admin = adminOpt.get();
+                    admin.setFailedAttempts(currentAttempts);
+                    if (currentAttempts >= 5) {
+                        admin.setLockoutUntil(LocalDateTime.now().plusMinutes(15));
+                    }
+                    try { adminRepository.save(admin); } catch (Exception ignored) {}
+                }
 
                 if (currentAttempts >= 5) {
-                    LocalDateTime until = LocalDateTime.now().plusMinutes(15);
-                    admin.setLockoutUntil(until);
-                    inMemoryLockoutUntil.put(username.toLowerCase(), until);
-                    try { adminRepository.save(admin); } catch (Exception ignored) {}
-
+                    inMemoryLockoutUntil.put(userKey, LocalDateTime.now().plusMinutes(15));
                     response.put("error", "You have reached 5 unsuccessful login attempts! Account is locked for 15 minutes.");
                     return ResponseEntity.status(429).body(response);
                 } else {
-                    try { adminRepository.save(admin); } catch (Exception ignored) {}
                     int remainingAttempts = 5 - currentAttempts;
                     response.put("error", String.format("Invalid username or password! You have %d unsuccessful attempt(s). %d attempt(s) remaining before 15-min lockout.", currentAttempts, remainingAttempts));
                     return ResponseEntity.status(401).body(response);
                 }
             }
+        } catch (Exception fatalError) {
+            System.err.println("[FATAL] Error during admin login: " + fatalError.getMessage());
+            fatalError.printStackTrace();
+            response.put("error", "Invalid username or password!");
+            return ResponseEntity.status(401).body(response);
         }
-
-        response.put("error", "Invalid username or password!");
-        return ResponseEntity.status(401).body(response);
+    }
     }
 
     @PostMapping("/student-login")
