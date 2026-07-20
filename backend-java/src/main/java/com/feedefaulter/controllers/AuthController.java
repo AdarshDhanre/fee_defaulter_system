@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -36,39 +38,76 @@ public class AuthController {
         Optional<Admin> adminOpt = adminRepository.findByUsername(username);
         if (adminOpt.isPresent()) {
             Admin admin = adminOpt.get();
-            
+
+            // 1. Check if account is locked out
+            if (admin.getLockoutUntil() != null) {
+                if (admin.getLockoutUntil().isAfter(LocalDateTime.now())) {
+                    long remainingSeconds = Duration.between(LocalDateTime.now(), admin.getLockoutUntil()).getSeconds();
+                    long remainingMinutes = Math.max(1, (remainingSeconds + 59) / 60);
+                    response.put("error", String.format("Account is locked due to 5 failed attempts! Try again in %d minute(s).", remainingMinutes));
+                    return ResponseEntity.status(429).body(response);
+                } else {
+                    // Lockout period expired
+                    admin.setLockoutUntil(null);
+                    admin.setFailedAttempts(0);
+                    adminRepository.save(admin);
+                }
+            }
+
             boolean matches = passwordEncoder.matches(password, admin.getPassword());
             boolean isWerkzeug = false;
-            
+
             if (!matches) {
                 if (com.feedefaulter.utils.WerkzeugPasswordEncoder.checkPassword(password, admin.getPassword())) {
                     matches = true;
                     isWerkzeug = true;
                 }
             }
-            
+
             if (matches) {
+                // Reset failed attempts on success
+                admin.setFailedAttempts(0);
+                admin.setLockoutUntil(null);
+
                 if (Boolean.FALSE.equals(admin.getIsVerified())) {
+                    adminRepository.save(admin);
                     response.put("error", "Account not verified! Please verify OTP.");
                     response.put("email", admin.getEmail());
                     return ResponseEntity.status(403).body(response);
                 }
-                
+
                 if (isWerkzeug) {
                     try {
                         admin.setPassword(passwordEncoder.encode(password));
-                        adminRepository.save(admin);
                         System.out.println("[INFO] Upgraded admin '" + admin.getUsername() + "' password hash from Werkzeug to BCrypt.");
                     } catch (Exception e) {
                         System.err.println("[WARN] Failed to upgrade Werkzeug password hash to BCrypt: " + e.getMessage());
                     }
                 }
-                
+
+                adminRepository.save(admin);
+
                 response.put("token", "mock-jwt-admin-token-" + admin.getId());
                 response.put("role", "ADMIN");
                 response.put("username", admin.getUsername());
                 response.put("id", admin.getId());
                 return ResponseEntity.ok(response);
+            } else {
+                // Increment failed attempts
+                int currentAttempts = (admin.getFailedAttempts() != null ? admin.getFailedAttempts() : 0) + 1;
+                admin.setFailedAttempts(currentAttempts);
+
+                if (currentAttempts >= 5) {
+                    admin.setLockoutUntil(LocalDateTime.now().plusMinutes(15));
+                    adminRepository.save(admin);
+                    response.put("error", "Too many failed login attempts! Account is locked for 15 minutes.");
+                    return ResponseEntity.status(429).body(response);
+                } else {
+                    adminRepository.save(admin);
+                    int remainingAttempts = 5 - currentAttempts;
+                    response.put("error", String.format("Invalid username or password! %d attempt(s) remaining before 15-min lockout.", remainingAttempts));
+                    return ResponseEntity.status(401).body(response);
+                }
             }
         }
 

@@ -3,6 +3,8 @@ package com.feedefaulter.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @Entity
 @Table(name = "admin")
@@ -26,4 +28,10 @@ public class Admin {
 
     @Column(name = "is_verified", columnDefinition = "boolean default false")
     private Boolean isVerified = false;
+
+    @Column(name = "failed_attempts", columnDefinition = "integer default 0")
+    private Integer failedAttempts = 0;
+
+    @Column(name = "lockout_until")
+    private LocalDateTime lockoutUntil;
 }

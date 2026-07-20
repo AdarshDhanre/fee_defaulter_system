@@ -8,6 +8,8 @@ class Admin(db.Model):
     password = db.Column(db.String(200), nullable=False)
     otp = db.Column(db.String(10))
     is_verified = db.Column(db.Boolean, default=False)
+    failed_attempts = db.Column(db.Integer, default=0)
+    lockout_until = db.Column(db.DateTime, nullable=True)
 
     def set_password(self, password):
         self.password = generate_password_hash(password)

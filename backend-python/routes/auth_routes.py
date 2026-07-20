@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, session
 from models.admin_model import Admin
 from extensions import db
+from datetime import datetime, timedelta
 import random
 import re
 from services.alert_service import send_email
@@ -23,14 +24,45 @@ def login():
         password = request.form["password"]
 
         admin = Admin.query.filter_by(username=username).first()
-        if admin and admin.check_password(password):
-            if not admin.is_verified:
-                return render_template("login.html", error="Account not verified! Please register again or verify.")
-            # Direct login without OTP
-            session['admin_id'] = admin.id
-            return redirect("/dashboard")
-        else:
-            return render_template("login.html", error="Invalid username or password!")
+        if admin:
+            now = datetime.now()
+            # 1. Check if account is locked out
+            if admin.lockout_until:
+                if admin.lockout_until > now:
+                    remaining_secs = int((admin.lockout_until - now).total_seconds())
+                    remaining_mins = max(1, (remaining_secs + 59) // 60)
+                    return render_template("login.html", error=f"Account is locked due to 5 failed attempts! Try again in {remaining_mins} minute(s).")
+                else:
+                    # Lockout period expired
+                    admin.lockout_until = None
+                    admin.failed_attempts = 0
+                    db.session.commit()
+
+            if admin.check_password(password):
+                # Reset failed attempts on success
+                admin.failed_attempts = 0
+                admin.lockout_until = None
+                db.session.commit()
+
+                if not admin.is_verified:
+                    return render_template("login.html", error="Account not verified! Please register again or verify.")
+                # Direct login without OTP
+                session['admin_id'] = admin.id
+                return redirect("/dashboard")
+            else:
+                current_attempts = (admin.failed_attempts or 0) + 1
+                admin.failed_attempts = current_attempts
+
+                if current_attempts >= 5:
+                    admin.lockout_until = datetime.now() + timedelta(minutes=15)
+                    db.session.commit()
+                    return render_template("login.html", error="Too many failed login attempts! Account is locked for 15 minutes.")
+                else:
+                    db.session.commit()
+                    remaining = 5 - current_attempts
+                    return render_template("login.html", error=f"Invalid username or password! {remaining} attempt(s) remaining before 15-min lockout.")
+
+        return render_template("login.html", error="Invalid username or password!")
 
     msg = request.args.get('msg')
     return render_template("login.html", msg=msg)

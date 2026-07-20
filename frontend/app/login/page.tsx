@@ -4,7 +4,7 @@ import { getBackendUrl } from "@/utils/api";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { User, Lock, Eye, EyeOff } from "lucide-react";
+import { User, Lock, Eye, EyeOff, ShieldAlert } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -125,8 +125,13 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className="mb-5 p-3 bg-red-950/40 border border-red-500/30 rounded-xl text-red-300 text-xs text-center font-medium">
-                {error}
+              <div className={`mb-5 p-3 rounded-xl text-xs text-center font-medium flex items-center justify-center gap-2 ${
+                error.toLowerCase().includes("locked") || error.toLowerCase().includes("attempts")
+                  ? "bg-amber-950/60 border border-amber-500/40 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.2)]"
+                  : "bg-red-950/40 border border-red-500/30 text-red-300"
+              }`}>
+                {error.toLowerCase().includes("locked") && <ShieldAlert className="w-4 h-4 shrink-0 text-amber-400" />}
+                <span>{error}</span>
               </div>
             )}
 
