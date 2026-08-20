@@ -98,7 +98,7 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "api-key", "value": "YOUR_BREVO_API_KEY_HERE" },
+            { "name": "api-key", "value": "BREVO_API_KEY_SET_IN_N8N" },
             { "name": "content-type", "value": "application/json" }
           ]
         },
@@ -120,7 +120,7 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "api-key", "value": "YOUR_BREVO_API_KEY_HERE" },
+            { "name": "api-key", "value": "BREVO_API_KEY_SET_IN_N8N" },
             { "name": "content-type", "value": "application/json" }
           ]
         },
@@ -142,7 +142,7 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "api-key", "value": "YOUR_BREVO_API_KEY_HERE" },
+            { "name": "api-key", "value": "BREVO_API_KEY_SET_IN_N8N" },
             { "name": "content-type", "value": "application/json" }
           ]
         },
@@ -201,7 +201,7 @@
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "https://docs.google.com/spreadsheets/d/1COZFpVNsGw0NslDsOHgb3_-m4hVlYGWwtU_PPL2DzJ8/edit?usp=sharing",
+          "value": "https://docs.google.com/spreadsheets/d/1kSmbQX9rLU5gP1rMSs9WmwjPqky86292fC27VfYZyy4/edit?usp=sharing",
           "mode": "url"
         },
         "sheetName": {
@@ -209,7 +209,7 @@
           "value": "gid=0",
           "mode": "list",
           "cachedResultName": "Sheet1",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1COZFpVNsGw0NslDsOHgb3_-m4hVlYGWwtU_PPL2DzJ8/edit#gid=0"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kSmbQX9rLU5gP1rMSs9WmwjPqky86292fC27VfYZyy4/edit#gid=0"
         },
         "columns": {
           "mappingMode": "defineBelow",
