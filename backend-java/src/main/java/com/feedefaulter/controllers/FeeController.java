@@ -105,11 +105,13 @@ public class FeeController {
         Student student = studentOpt.get();
 
         // 1. Normalize course name (e.g., B.Tech -> B. Tech)
-        String searchCourse = student.getCourse() != null ? student.getCourse().trim() : "";
-        String cleanCourse = searchCourse.replaceAll("\\s+", "").toLowerCase();
-        if (cleanCourse.contains("b.tech") || cleanCourse.contains("btech")) {
+        String rawCourse = student.getCourse() != null ? student.getCourse().trim() : "";
+        String cleanCourse = rawCourse.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
+        String searchCourse = "B. Tech";
+
+        if (cleanCourse.contains("btech") || cleanCourse.contains("be")) {
             searchCourse = "B. Tech";
-        } else if (cleanCourse.contains("m.tech") || cleanCourse.contains("mtech")) {
+        } else if (cleanCourse.contains("mtech") || cleanCourse.contains("me")) {
             searchCourse = "M.Tech";
         } else if (cleanCourse.contains("mba")) {
             searchCourse = "MBA";
@@ -117,73 +119,98 @@ public class FeeController {
             searchCourse = "MCA";
         } else if (cleanCourse.contains("bcca")) {
             searchCourse = "BCCA";
+        } else if (cleanCourse.contains("msc")) {
+            searchCourse = "M.SC";
         } else if (cleanCourse.contains("bsc")) {
             searchCourse = "BSC";
-        } else if (cleanCourse.contains("m.sc") || cleanCourse.contains("msc")) {
-            searchCourse = "M.SC";
-        } else if (cleanCourse.contains("polytechnic") || cleanCourse.contains("poly")) {
+        } else if (cleanCourse.contains("polytechnic") || cleanCourse.contains("poly") || cleanCourse.contains("diploma")) {
             searchCourse = "Polytechnic";
+        } else if (!rawCourse.isEmpty()) {
+            searchCourse = rawCourse;
         }
 
         // 2. Normalize year mapping (First Year or Direct Second Yr.)
         String mappedYear = "First Year";
         String cleanYear = student.getYear() != null ? student.getYear().toUpperCase() : "";
-        if (cleanYear.contains("DSY") || cleanYear.contains("DIRECT")) {
+        if (cleanYear.contains("DSY") || cleanYear.contains("DIRECT") || cleanYear.contains("2ND") || cleanYear.contains("SECOND")) {
             mappedYear = "Direct Second Yr.";
         }
 
         // 3. Normalize branch mapping
-        String searchBranch = student.getBranch() != null ? student.getBranch().trim().toLowerCase() : "";
-        Map<String, String> branchMap = new LinkedHashMap<>();
-        branchMap.put("aiml", "AI");
-        branchMap.put("ai/ml", "AI");
-        branchMap.put("ai", "AI");
-        branchMap.put("computer science", "CSE");
-        branchMap.put("information tech", "IT");
-        branchMap.put("cyber security", "CYS");
-        branchMap.put("artificial intelligence", "AI");
-        branchMap.put("data science", "DSE");
-        branchMap.put("electronics", "ETC");
-        branchMap.put("mechanical", "ME");
-        branchMap.put("civil", "CE");
-        branchMap.put("electrical", "EE");
-        branchMap.put("vlsi", "VLSI");
-        branchMap.put("cad", "CAD/CAM");
-        branchMap.put("srt", "SRT");
+        String rawBranch = student.getBranch() != null ? student.getBranch().trim() : "";
+        String cleanBranch = rawBranch.toLowerCase();
+        String searchBranch = rawBranch;
 
-        boolean mapped = false;
-        for (Map.Entry<String, String> entry : branchMap.entrySet()) {
-            if (searchBranch.contains(entry.getKey())) {
-                searchBranch = entry.getValue();
-                mapped = true;
-                break;
-            }
-        }
-        
-        if (!mapped) {
-            // Keep original casing/capitalization if not mapped
-            searchBranch = student.getBranch() != null ? student.getBranch().trim() : "";
+        if (cleanBranch.contains("ai") || cleanBranch.contains("aiml") || cleanBranch.contains("artificial")) {
+            searchBranch = "AI";
+        } else if (cleanBranch.contains("comp") || cleanBranch.contains("cse") || cleanBranch.contains("cs")) {
+            searchBranch = "CSE";
+        } else if (cleanBranch.contains("cyber") || cleanBranch.contains("cys")) {
+            searchBranch = "CYS";
+        } else if (cleanBranch.contains("data") || cleanBranch.contains("dse")) {
+            searchBranch = "DSE";
+        } else if (cleanBranch.contains("info") || cleanBranch.contains("it")) {
+            searchBranch = "IT";
+        } else if (cleanBranch.contains("electr") || cleanBranch.contains("etc") || cleanBranch.contains("ece")) {
+            searchBranch = "ETC";
+        } else if (cleanBranch.contains("elect") || cleanBranch.contains("ee")) {
+            searchBranch = "EE";
+        } else if (cleanBranch.contains("mech") || cleanBranch.contains("me")) {
+            searchBranch = "ME";
+        } else if (cleanBranch.contains("civil") || cleanBranch.contains("ce")) {
+            searchBranch = "CE";
         }
 
+        // Multi-level fallback matching:
+        // Level 1: Course + Year + Branch
         Optional<FeeStructure> feeStructOpt = feeStructureRepository
                 .findFirstByCourseAndYearAndBranchContainingIgnoreCase(searchCourse, mappedYear, searchBranch);
 
+        // Level 2: Course + Branch (any year)
         if (feeStructOpt.isEmpty()) {
-            return ResponseEntity.ok(Map.of("total_fee", 0, "message", "No specific fee structure found"));
+            List<FeeStructure> courseStructures = feeStructureRepository.findAll();
+            feeStructOpt = courseStructures.stream()
+                    .filter(s -> s.getCourse().equalsIgnoreCase(searchCourse) && s.getBranch().toUpperCase().contains(searchBranch.toUpperCase()))
+                    .findFirst();
+        }
+
+        // Level 3: Just Course (first matching course fee)
+        if (feeStructOpt.isEmpty()) {
+            List<FeeStructure> courseStructures = feeStructureRepository.findAll();
+            feeStructOpt = courseStructures.stream()
+                    .filter(s -> s.getCourse().equalsIgnoreCase(searchCourse))
+                    .findFirst();
+        }
+
+        if (feeStructOpt.isEmpty()) {
+            // Fallback: If still not found, pick first available fee structure or default amount
+            List<FeeStructure> all = feeStructureRepository.findAll();
+            if (!all.isEmpty()) {
+                feeStructOpt = Optional.of(all.get(0));
+            } else {
+                return ResponseEntity.ok(Map.of("total_fee", 138745, "message", "Default fee applied"));
+            }
         }
 
         FeeStructure struct = feeStructOpt.get();
-        String cat = student.getCategory();
-        double fee = 0;
+        String cat = student.getCategory() != null ? student.getCategory().trim().toUpperCase() : "OPEN";
+        double fee = struct.getFeeOpen();
 
-        if ("Open".equalsIgnoreCase(cat)) fee = struct.getFeeOpen();
-        else if ("OBC".equalsIgnoreCase(cat)) fee = struct.getFeeObc();
-        else if ("VJ/NT".equalsIgnoreCase(cat)) fee = struct.getFeeVjnt();
-        else if ("SC/ST".equalsIgnoreCase(cat)) fee = struct.getFeeScst();
-        else if ("OMS".equalsIgnoreCase(cat)) fee = struct.getFeeOms();
-        else if ("Mgmt.Quota".equalsIgnoreCase(cat)) fee = struct.getFeeMgmt();
+        if (cat.contains("OBC")) {
+            fee = struct.getFeeObc() != null ? struct.getFeeObc() : struct.getFeeOpen();
+        } else if (cat.contains("VJ") || cat.contains("NT")) {
+            fee = struct.getFeeVjnt() != null ? struct.getFeeVjnt() : struct.getFeeOpen();
+        } else if (cat.contains("SC") || cat.contains("ST")) {
+            fee = struct.getFeeScst() != null ? struct.getFeeScst() : struct.getFeeOpen();
+        } else if (cat.contains("OMS")) {
+            fee = struct.getFeeOms() != null ? struct.getFeeOms() : struct.getFeeOpen();
+        } else if (cat.contains("MGMT") || cat.contains("MANAGEMENT")) {
+            fee = struct.getFeeMgmt() != null ? struct.getFeeMgmt() : struct.getFeeOpen();
+        } else {
+            fee = struct.getFeeOpen() != null ? struct.getFeeOpen() : 138745;
+        }
 
-        return ResponseEntity.ok(Map.of("total_fee", (int) fee));
+        return ResponseEntity.ok(Map.of("total_fee", (int) Math.round(fee)));
     }
 
     @GetMapping("/structures")
