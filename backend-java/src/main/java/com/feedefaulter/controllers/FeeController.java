@@ -162,15 +162,18 @@ public class FeeController {
         }
 
         // Multi-level fallback matching:
+        final String finalSearchCourse = searchCourse;
+        final String finalSearchBranch = searchBranch;
+
         // Level 1: Course + Year + Branch
         Optional<FeeStructure> feeStructOpt = feeStructureRepository
-                .findFirstByCourseAndYearAndBranchContainingIgnoreCase(searchCourse, mappedYear, searchBranch);
+                .findFirstByCourseAndYearAndBranchContainingIgnoreCase(finalSearchCourse, mappedYear, finalSearchBranch);
 
         // Level 2: Course + Branch (any year)
         if (feeStructOpt.isEmpty()) {
             List<FeeStructure> courseStructures = feeStructureRepository.findAll();
             feeStructOpt = courseStructures.stream()
-                    .filter(s -> s.getCourse().equalsIgnoreCase(searchCourse) && s.getBranch().toUpperCase().contains(searchBranch.toUpperCase()))
+                    .filter(s -> s.getCourse().equalsIgnoreCase(finalSearchCourse) && s.getBranch().toUpperCase().contains(finalSearchBranch.toUpperCase()))
                     .findFirst();
         }
 
@@ -178,7 +181,7 @@ public class FeeController {
         if (feeStructOpt.isEmpty()) {
             List<FeeStructure> courseStructures = feeStructureRepository.findAll();
             feeStructOpt = courseStructures.stream()
-                    .filter(s -> s.getCourse().equalsIgnoreCase(searchCourse))
+                    .filter(s -> s.getCourse().equalsIgnoreCase(finalSearchCourse))
                     .findFirst();
         }
 
