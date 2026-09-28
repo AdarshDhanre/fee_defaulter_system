@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fee Defaulter System — Project Brief (Hinglish)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f0f4ff;
+      color: #1a1a2e;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 20px auto;
+      background: #fff;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+      border-radius: 4px;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    /* ─── Cover Page ─────────────────────────────── */
+    .cover {
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      padding: 60px 50px 50px;
+      color: white;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cover::before {
+      content: '';
+      position: absolute; top: -50px; left: -50px;
+      width: 200px; height: 200px;
+      background: rgba(99,102,241,0.2);
+      border-radius: 50%;
+    }
+    .cover::after {
+      content: '';
+      position: absolute; bottom: -60px; right: -60px;
+      width: 250px; height: 250px;
+      background: rgba(168,85,247,0.15);
+      border-radius: 50%;
+    }
+    .cover .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #a5b4fc;
+      padding: 6px 18px;
+      border-radius: 50px;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      position: relative; z-index: 1;
+    }
+    .cover h1 {
+      font-size: 38px;
+      font-weight: 900;
+      background: linear-gradient(90deg, #818cf8, #c084fc, #fb7185);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+      position: relative; z-index: 1;
+      line-height: 1.1;
+    }
+    .cover .subtitle {
+      font-size: 15px;
+      color: #c7d2fe;
+      margin-bottom: 36px;
+      position: relative; z-index: 1;
+    }
+    .cover .tags {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      position: relative; z-index: 1;
+    }
+    .cover .tag {
+      background: rgba(99,102,241,0.25);
+      border: 1px solid rgba(99,102,241,0.4);
+      color: #e0e7ff;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .cover .meta {
+      margin-top: 40px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      position: relative; z-index: 1;
+    }
+    .cover .meta-item { text-align: center; }
+    .cover .meta-item .label { color: #94a3b8; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
+    .cover .meta-item .value { color: #e2e8f0; font-size: 13px; font-weight: 600; margin-top: 4px; }
+
+    /* ─── Content area ────────────────────────────── */
+    .content { padding: 40px 50px; }
+
+    /* ─── Section ─────────────────────────────────── */
+    .section { margin-bottom: 36px; }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e0e7ff;
+    }
+    .section-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #1e1b4b;
+    }
+    .section-num {
+      font-size: 10px;
+      color: #8b5cf6;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ─── Cards ───────────────────────────────────── */
+    .card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 14px;
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1e1b4b;
+      margin-bottom: 8px;
+    }
+    .card p { color: #475569; font-size: 12.5px; }
+
+    /* ─── Grid ────────────────────────────────────── */
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+    /* ─── Table ───────────────────────────────────── */
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+    thead th {
+      background: #4f46e5;
+      color: white;
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 600;
+    }
+    thead th:first-child { border-radius: 8px 0 0 0; }
+    thead th:last-child  { border-radius: 0 8px 0 0; }
+    tbody tr:nth-child(even) { background: #f1f5f9; }
+    tbody tr:nth-child(odd)  { background: #ffffff; }
+    tbody td { padding: 9px 12px; color: #374151; border-bottom: 1px solid #e5e7eb; }
+
+    /* ─── Pills / Badges ──────────────────────────── */
+    .pill {
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .pill-blue   { background: #dbeafe; color: #1d4ed8; }
+    .pill-green  { background: #d1fae5; color: #065f46; }
+    .pill-yellow { background: #fef3c7; color: #92400e; }
+    .pill-red    { background: #fee2e2; color: #991b1b; }
+    .pill-purple { background: #ede9fe; color: #5b21b6; }
+    .pill-orange { background: #ffedd5; color: #9a3412; }
+
+    /* ─── Architecture Diagram (CSS only) ─────────── */
+    .arch-box {
+      background: linear-gradient(135deg, #1e1b4b, #312e81);
+      border-radius: 16px;
+      padding: 30px;
+      color: white;
+    }
+    .arch-layer {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .arch-node {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      padding: 10px 16px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      min-width: 100px;
+    }
+    .arch-node .icon { font-size: 20px; display: block; margin-bottom: 4px; }
+    .arch-node .name { color: #e0e7ff; }
+    .arch-node .tech { color: #94a3b8; font-size: 9.5px; font-weight: 400; margin-top: 2px; }
+    .arch-arrow {
+      text-align: center;
+      color: #818cf8;
+      font-size: 18px;
+      margin: 4px 0;
+    }
+    .arch-label {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 10px;
+      margin-bottom: 10px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .arch-divider {
+      border: none;
+      border-top: 1px dashed rgba(255,255,255,0.15);
+      margin: 14px 0;
+    }
+
+    /* ─── Flow chart ──────────────────────────────── */
+    .flow {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .flow-step {
+      background: #ede9fe;
+      border: 2px solid #c4b5fd;
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #4c1d95;
+      text-align: center;
+    }
+    .flow-arrow {
+      color: #8b5cf6;
+      font-size: 18px;
+      padding: 0 6px;
+      font-weight: 700;
+    }
+
+    /* ─── Highlight box ───────────────────────────── */
+    .highlight {
+      background: linear-gradient(135deg, #ede9fe, #dbeafe);
+      border: 1px solid #c4b5fd;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-top: 12px;
+    }
+    .highlight-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #4c1d95;
+      margin-bottom: 6px;
+    }
+    .highlight p { color: #5b21b6; font-size: 12.5px; }
+
+    /* ─── List ────────────────────────────────────── */
+    ul.feature-list { list-style: none; padding: 0; }
+    ul.feature-list li {
+      padding: 6px 0 6px 24px;
+      position: relative;
+      color: #374151;
+      font-size: 12.5px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    ul.feature-list li::before {
+      content: '✓';
+      position: absolute; left: 0;
+      color: #4f46e5;
+      font-weight: 700;
+    }
+
+    /* ─── Code block ──────────────────────────────── */
+    .code-block {
+      background: #0f172a;
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-family: 'Courier New', monospace;
+      font-size: 11.5px;
+      color: #94a3b8;
+      margin-top: 12px;
+      line-height: 1.7;
+    }
+    .code-block .c-green  { color: #4ade80; }
+    .code-block .c-blue   { color: #60a5fa; }
+    .code-block .c-yellow { color: #fbbf24; }
+    .code-block .c-purple { color: #a78bfa; }
+    .code-block .c-pink   { color: #f472b6; }
+    .code-block .c-gray   { color: #64748b; }
+
+    /* ─── Page break ──────────────────────────────── */
+    .page-break { page-break-before: always; padding-top: 40px; }
+
+    /* ─── Footer ──────────────────────────────────── */
+    .footer {
+      background: linear-gradient(135deg, #0f0c29, #302b63);
+      padding: 30px 50px;
+      color: #94a3b8;
+      font-size: 11px;
+      text-align: center;
+      margin-top: 20px;
+    }
+    .footer strong { color: #c7d2fe; }
+
+    /* ─── Print ───────────────────────────────────── */
+    @media print {
+      body { background: white; }
+      .page { box-shadow: none; margin: 0; width: 100%; }
+      .page-break { page-break-before: always; padding-top: 20px; }
+    }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .stat-card {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      border-radius: 12px;
+      padding: 16px;
+      color: white;
+      text-align: center;
+    }
+    .stat-card .stat-num { font-size: 28px; font-weight: 900; }
+    .stat-card .stat-label { font-size: 11px; color: #c4b5fd; margin-top: 4px; }
+
+    .info-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+      align-items: flex-start;
+    }
+    .info-key {
+      font-weight: 700;
+      color: #4f46e5;
+      min-width: 140px;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    .info-val { color: #374151; font-size: 12px; }
+
+    .warning-box {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-left: 4px solid #f97316;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-top: 12px;
+    }
+    .warning-box p { color: #7c2d12; font-size: 12px; }
+    .warning-box strong { color: #ea580c; }
+
+    .success-box {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-left: 4px solid #22c55e;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-top: 12px;
+    }
+    .success-box p { color: #14532d; font-size: 12px; }
+
+    .print-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 32px rgba(79,70,229,0.4);
+      z-index: 1000;
+      font-family: 'Inter', sans-serif;
+    }
+    .print-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(79,70,229,0.5); }
+    @media print { .print-btn { display: none; } }
+  </style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">🖨️ PDF Save Karo</button>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  PAGE 1: COVER                                -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="cover">
+    <div class="badge">🎓 Project Brief — Hinglish Edition</div>
+    <h1>Fee Defaulter System</h1>
+    <p class="subtitle">Enterprise-grade Fee Management &amp; Automated Alert System for Educational Institutions</p>
+    <div class="tags">
+      <span class="tag">🌐 Vercel (Frontend)</span>
+      <span class="tag">🚀 Render (Backend)</span>
+      <span class="tag">🔁 n8n Automation</span>
+      <span class="tag">🧠 Gemini AI OCR</span>
+      <span class="tag">💳 Razorpay</span>
+      <span class="tag">📊 Google Sheets</span>
+      <span class="tag">🗄️ Supabase PostgreSQL</span>
+    </div>
+    <div class="meta">
+      <div class="meta-item">
+        <div class="label">Frontend</div>
+        <div class="value">Next.js 14 + TypeScript</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Backend</div>
+        <div class="value">Java Spring Boot + Python Flask</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Database</div>
+        <div class="value">Supabase PostgreSQL</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Date</div>
+        <div class="value">September 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 1: Project Kya Hai ── -->
+  <div class="content">
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#ede9fe;">🏫</div>
+        <div>
+          <div class="section-num">Section 01</div>
+          <div class="section-title">Project Kya Hai? (Overview)</div>
+        </div>
+      </div>
+
+      <p style="color:#475569;font-size:13px;margin-bottom:16px;line-height:1.8;">
+        <strong>Fee Defaulter System</strong> ek <strong>enterprise-grade web application</strong> hai jo educational institutions ke liye banaya gaya hai.
+        Iska main kaam yeh hai ki jo students ne fee nahi bhari — unhe <strong>automatically track karo, email alerts bhejo, aur payment process karo</strong>.
+        Pura system real-time hai aur multiple technologies ko ek saath integrate karta hai.
+      </p>
+
+      <div class="grid3">
+        <div class="stat-card">
+          <div class="stat-num">3</div>
+          <div class="stat-label">Major Backend Services</div>
+        </div>
+        <div class="stat-card" style="background:linear-gradient(135deg,#0891b2,#0e7490);">
+          <div class="stat-num">6+</div>
+          <div class="stat-label">AI + 3rd Party Integrations</div>
+        </div>
+        <div class="stat-card" style="background:linear-gradient(135deg,#059669,#047857);">
+          <div class="stat-num">15+</div>
+          <div class="stat-label">API Routes / Features</div>
+        </div>
+      </div>
+
+      <div class="highlight" style="margin-top:16px;">
+        <div class="highlight-title">💡 Simple shabdon mein samjho:</div>
+        <p>
+          Imagine karo ek college hai. Hazaron students hain. Fee collection manually track karna mushkil hai.
+          Yeh system admin ko ek <strong>dashboard</strong> deta hai jahan se woh sab kuch dekh sakta hai —
+          kaun defaulter hai, kitni fee baaki hai, payment kab ki thi — aur <strong>ek click mein sab defaulters ko email alert</strong> bhej sakta hai.
+          Students apna portal khol ke <strong>online pay</strong> kar sakte hain ya bank challan upload kar sakte hain.
+        </p>
+      </div>
+    </div>
+
+    <!-- ── SECTION 2: Tech Stack ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#dbeafe;">⚙️</div>
+        <div>
+          <div class="section-num">Section 02</div>
+          <div class="section-title">Technology Stack (Kya kya use kiya?)</div>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Layer</th>
+            <th>Technology</th>
+            <th>Kaha Deploy Hai?</th>
+            <th>Kaam Kya Hai?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="pill pill-blue">Frontend</span></td>
+            <td>Next.js 14, TypeScript, Tailwind CSS</td>
+            <td>☁️ Vercel</td>
+            <td>Admin Dashboard + Student Portal UI</td>
+          </tr>
+          <tr>
+            <td><span class="pill pill-purple">Primary Backend</span></td>
+            <td>Java Spring Boot, Spring Data JPA, Maven</td>
+            <td>🚀 Render</td>
+            <td>Enterprise REST API — Students, Fees, Auth</td>
+          </tr>
+          <tr>
+            <td><span class="pill pill-orange">Automation Backend</span></td>
+            <td>Python Flask, SQLAlchemy, Flask-CORS</td>
+            <td>🚀 Render</td>
+            <td>OCR, Razorpay Payments, Alerts Engine</td>
+          </tr>
+          <tr>
+            <td><span class="pill pill-green">Database</span></td>
+            <td>Supabase PostgreSQL</td>
+            <td>☁️ Supabase Cloud</td>
+            <td>Shared central database — dono backends use karte hain</td>
+          </tr>
+          <tr>
+            <td><span class="pill pill-yellow">Automation</span></td>
+            <td>n8n Workflow Engine</td>
+            <td>☁️ n8n Cloud / Self-hosted</td>
+            <td>Email delivery + Google Sheets logging</td>
+          </tr>
+          <tr>
+            <td><span class="pill pill-red">AI / OCR</span></td>
+            <td>Google Gemini 2.5 Flash</td>
+            <td>Google API</td>
+            <td>Bank receipt scan karke UTR/amount extract karna</td>
+          </tr>
+          <tr>
+            <td><span class="pill pill-blue">Payment Gateway</span></td>
+            <td>Razorpay</td>
+            <td>Razorpay Cloud</td>
+            <td>Online fee payment — UPI, Card, Net Banking</td>
+          </tr>
+          <tr>
+            <td><span class="pill pill-green">Email Service</span></td>
+            <td>Brevo (Sendinblue) SMTP</td>
+            <td>Brevo Cloud</td>
+            <td>Transactional emails — OTP, Alerts, Receipts</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  PAGE 2: ARCHITECTURE                         -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="page page-break">
+  <div class="content">
+
+    <!-- ── SECTION 3: System Architecture ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#fef3c7;">🏗️</div>
+        <div>
+          <div class="section-num">Section 03</div>
+          <div class="section-title">System Architecture (System Kaise Kaam Karta Hai?)</div>
+        </div>
+      </div>
+
+      <div class="arch-box">
+        <div class="arch-label">👤 Users</div>
+        <div class="arch-layer">
+          <div class="arch-node">
+            <span class="icon">👨‍💼</span>
+            <div class="name">Admin</div>
+            <div class="tech">College Staff</div>
+          </div>
+          <div class="arch-node">
+            <span class="icon">🎓</span>
+            <div class="name">Student</div>
+            <div class="tech">Fee Payer</div>
+          </div>
+        </div>
+        <div class="arch-arrow">↓</div>
+
+        <div class="arch-label">🌐 Frontend Layer (Vercel)</div>
+        <div class="arch-layer">
+          <div class="arch-node" style="min-width:280px;background:rgba(99,102,241,0.3);">
+            <span class="icon">⚛️</span>
+            <div class="name">Next.js 14 App (Vercel)</div>
+            <div class="tech">Admin Dashboard + Student Portal — TypeScript + Tailwind</div>
+          </div>
+        </div>
+        <div class="arch-arrow">↓ REST API calls</div>
+
+        <div class="arch-label">🔧 Backend Layer (Render)</div>
+        <div class="arch-layer">
+          <div class="arch-node">
+            <span class="icon">☕</span>
+            <div class="name">Java Spring Boot</div>
+            <div class="tech">Port 8080 — Primary API</div>
+          </div>
+          <div class="arch-node">
+            <span class="icon">🐍</span>
+            <div class="name">Python Flask</div>
+            <div class="tech">Port 5000 — Automation</div>
+          </div>
+        </div>
+        <div class="arch-arrow">↓ Read/Write</div>
+
+        <div class="arch-label">🗄️ Data Layer</div>
+        <div class="arch-layer">
+          <div class="arch-node">
+            <span class="icon">🐘</span>
+            <div class="name">Supabase PostgreSQL</div>
+            <div class="tech">Shared Cloud Database</div>
+          </div>
+        </div>
+        <hr class="arch-divider"/>
+
+        <div class="arch-label">🔗 Integrations (Python Backend triggers karta hai)</div>
+        <div class="arch-layer">
+          <div class="arch-node">
+            <span class="icon">🔁</span>
+            <div class="name">n8n Webhook</div>
+            <div class="tech">Email + Sheets</div>
+          </div>
+          <div class="arch-node">
+            <span class="icon">📧</span>
+            <div class="name">Brevo SMTP</div>
+            <div class="tech">Email Delivery</div>
+          </div>
+          <div class="arch-node">
+            <span class="icon">📊</span>
+            <div class="name">Google Sheets</div>
+            <div class="tech">Payment Log</div>
+          </div>
+          <div class="arch-node">
+            <span class="icon">🧠</span>
+            <div class="name">Gemini AI</div>
+            <div class="tech">OCR Receipt</div>
+          </div>
+          <div class="arch-node">
+            <span class="icon">💳</span>
+            <div class="name">Razorpay</div>
+            <div class="tech">Payments</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 4: Deployment ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#d1fae5;">🌍</div>
+        <div>
+          <div class="section-num">Section 04</div>
+          <div class="section-title">Deployment — Kaha Deploy Hai?</div>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="card" style="border-left:4px solid #4f46e5;">
+          <div class="card-title">☁️ Vercel — Frontend</div>
+          <ul class="feature-list">
+            <li>Next.js 14 App Router deployed on Vercel</li>
+            <li>Automatic HTTPS + CDN globally</li>
+            <li>Every git push se automatic re-deploy</li>
+            <li>Environment variables: NEXT_PUBLIC_JAVA_API_URL, NEXT_PUBLIC_PYTHON_API_URL</li>
+            <li>Admin Dashboard + Student Portal dono yahan serve hote hain</li>
+          </ul>
+        </div>
+        <div class="card" style="border-left:4px solid #0891b2;">
+          <div class="card-title">🚀 Render — Backend</div>
+          <ul class="feature-list">
+            <li>Java Spring Boot → Render Web Service (Dockerfile)</li>
+            <li>Python Flask → Render Web Service (Gunicorn/Waitress)</li>
+            <li>Dono Render pe free tier mein deployed hain</li>
+            <li>Auto-deploy on push to main branch</li>
+            <li>Keep-alive ping: har 14 min pe /health hit karta hai (cold start rokne ke liye)</li>
+          </ul>
+        </div>
+        <div class="card" style="border-left:4px solid #8b5cf6;">
+          <div class="card-title">🔁 n8n — Workflow Automation</div>
+          <ul class="feature-list">
+            <li>n8n Cloud ya self-hosted pe run karta hai</li>
+            <li>2 Webhooks listen karta hai: /fee-otp aur /payment-sheets</li>
+            <li>Email type ke hisaab se route karta hai</li>
+            <li>Google Sheets mein payments automatically log karta hai</li>
+            <li>Brevo API se email bhejta hai</li>
+          </ul>
+        </div>
+        <div class="card" style="border-left:4px solid #059669;">
+          <div class="card-title">🐘 Supabase — Database</div>
+          <ul class="feature-list">
+            <li>PostgreSQL cloud database</li>
+            <li>Dono backends (Java + Python) same DB use karte hain</li>
+            <li>Connection via DATABASE_URL environment variable</li>
+            <li>Tables: student, fee, payment, offline_receipt, admin, fee_structure</li>
+            <li>Auto schema migration on startup</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  PAGE 3: FEATURES DETAIL                      -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="page page-break">
+  <div class="content">
+
+    <!-- ── SECTION 5: Admin Panel Features ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#fce7f3;">👨‍💼</div>
+        <div>
+          <div class="section-num">Section 05</div>
+          <div class="section-title">Admin Panel — Kya Kya Kar Sakta Hai Admin?</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <div class="card" style="border-left:4px solid #4f46e5;">
+            <div class="card-title">📊 Dashboard Analytics</div>
+            <ul class="feature-list">
+              <li>Total students count</li>
+              <li>Paid / Overdue / Partial count</li>
+              <li>Total late fine pending</li>
+              <li>Branch-wise revenue chart (bar graph)</li>
+              <li>60-second cache se fast loading</li>
+              <li>Pending challan receipts list</li>
+            </ul>
+          </div>
+
+          <div class="card" style="border-left:4px solid #0891b2;margin-top:14px;">
+            <div class="card-title">👥 Student Management (CRUD)</div>
+            <ul class="feature-list">
+              <li>Naye students add karo</li>
+              <li>Student ki details edit karo</li>
+              <li>Student delete karo</li>
+              <li>Roll No, Course, Branch, Year, Category</li>
+              <li>Search and filter students</li>
+            </ul>
+          </div>
+
+          <div class="card" style="border-left:4px solid #059669;margin-top:14px;">
+            <div class="card-title">💰 Fee Management</div>
+            <ul class="feature-list">
+              <li>Students ko fees assign karo</li>
+              <li>Due date set karo</li>
+              <li>Total fee, paid amount, due amount track karo</li>
+              <li>Late fine automatically calculate hota hai</li>
+              <li>Fee structure templates bana sakte ho</li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <div class="card" style="border-left:4px solid #dc2626;">
+            <div class="card-title">🚨 Defaulter Alert System</div>
+            <ul class="feature-list">
+              <li>Defaulters ki list dekho (overdue + partial)</li>
+              <li>Individual student ko email alert bhejo</li>
+              <li>"Alert All Defaulters" — ek click mein sab ko</li>
+              <li>Partial payers ko alag reminder</li>
+              <li>Email template automatically generate hota hai</li>
+            </ul>
+          </div>
+
+          <div class="card" style="border-left:4px solid #8b5cf6;margin-top:14px;">
+            <div class="card-title">✅ Challan Receipt Verification</div>
+            <ul class="feature-list">
+              <li>Students ke uploaded bank receipts dekho</li>
+              <li>AI (Gemini) ne extract kiya hua data dekho</li>
+              <li>UTR number, amount, date AI se extract hota hai</li>
+              <li>Approve ya Reject kar sakte ho</li>
+              <li>Approve karne pe fee record automatically update</li>
+              <li>Student ko email notification jaata hai</li>
+            </ul>
+          </div>
+
+          <div class="card" style="border-left:4px solid #f59e0b;margin-top:14px;">
+            <div class="card-title">📋 Payment History &amp; Reports</div>
+            <ul class="feature-list">
+              <li>Poora payment transaction history</li>
+              <li>Receipt ID, amount, method, date</li>
+              <li>Reports download karo</li>
+              <li>Manual payment entry bhi kar sakte ho</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Auth features -->
+      <div class="card" style="border-left:4px solid #6366f1;margin-top:14px;">
+        <div class="card-title">🔐 Admin Authentication — Security Features</div>
+        <div class="grid2" style="margin-top:8px;">
+          <div>
+            <p style="font-weight:600;color:#4f46e5;margin-bottom:6px;">Password Policy:</p>
+            <ul class="feature-list">
+              <li>Minimum 6 characters</li>
+              <li>Pehla letter Capital hona chahiye (A-Z)</li>
+              <li>Ek special character zaroor (@, #, $, %)</li>
+              <li>Real-time checklist UI mein dikhta hai</li>
+            </ul>
+          </div>
+          <div>
+            <p style="font-weight:600;color:#dc2626;margin-bottom:6px;">Brute Force Protection:</p>
+            <ul class="feature-list">
+              <li>Max 5 galat login attempts</li>
+              <li>5 attempts baad 15-minute account lockout</li>
+              <li>User ko remaining attempts dikhta hai</li>
+              <li>Successful login pe counter reset</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  PAGE 4: STUDENT PORTAL + AI FEATURES         -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="page page-break">
+  <div class="content">
+
+    <!-- ── SECTION 6: Student Portal ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#d1fae5;">🎓</div>
+        <div>
+          <div class="section-num">Section 06</div>
+          <div class="section-title">Student Portal — Student Kya Kya Kar Sakta Hai?</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <div class="card" style="border-left:4px solid #059669;">
+            <div class="card-title">🔑 OTP Login (Email Verification)</div>
+            <p>Student apna Roll No + Email deta hai. System OTP bhejta hai email pe (via n8n + Brevo). OTP verify karne ke baad student dashboard access milta hai. Koi password nahi — fully secure OTP-based authentication.</p>
+          </div>
+
+          <div class="card" style="border-left:4px solid #0891b2;margin-top:14px;">
+            <div class="card-title">💳 Online Payment (Razorpay)</div>
+            <p>Student apni pending fee select karta hai. Razorpay payment window khulti hai. UPI, Credit/Debit Card, Net Banking support karta hai. Payment successful hone pe:</p>
+            <ul class="feature-list" style="margin-top:8px;">
+              <li>Fee record automatically update</li>
+              <li>Receipt ID generate</li>
+              <li>Payment success email student ko jaata hai</li>
+              <li>Google Sheets mein automatically entry</li>
+            </ul>
+          </div>
+
+          <div class="card" style="border-left:4px solid #8b5cf6;margin-top:14px;">
+            <div class="card-title">📄 Receipt Download</div>
+            <p>Student apna payment receipt PDF download kar sakta hai. Receipt mein student details, payment amount, transaction ID, date sab hota hai.</p>
+          </div>
+        </div>
+
+        <div>
+          <div class="card" style="border-left:4px solid #f59e0b;">
+            <div class="card-title">📸 Offline Challan Upload (AI OCR)</div>
+            <p>Jab student bank mein cash deposit karta hai:</p>
+            <ul class="feature-list" style="margin-top:8px;">
+              <li>Bank challan/receipt ki photo upload karo</li>
+              <li>Gemini AI image scan karta hai</li>
+              <li>UTR number, amount, date automatically extract hota hai</li>
+              <li>Admin ko pending challan dikhta hai</li>
+              <li>Admin approve/reject karta hai</li>
+              <li>Status email student ko jaata hai</li>
+            </ul>
+          </div>
+
+          <div class="card" style="border-left:4px solid #4f46e5;margin-top:14px;">
+            <div class="card-title">🤖 EduAI — AI Chat Assistant</div>
+            <p>Student portal mein ek <strong>Gemini-powered AI chatbot</strong> hai — "EduAI". Student fee-related questions pooch sakta hai. Fee status, payment process, deadline — sab ke baare mein AI guidance deta hai.</p>
+          </div>
+
+          <div class="card" style="border-left:4px solid #dc2626;margin-top:14px;">
+            <div class="card-title">📊 Fee Status Overview</div>
+            <ul class="feature-list">
+              <li>Total fee amount</li>
+              <li>Kitna pay kiya (paid amount)</li>
+              <li>Kitna baaki hai (remaining)</li>
+              <li>Late fine ka amount</li>
+              <li>Payment history list</li>
+              <li>Offline challan submissions status</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 7: Gemini OCR Detail ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#fef9c3;">🧠</div>
+        <div>
+          <div class="section-num">Section 07</div>
+          <div class="section-title">Gemini 2.5 Flash OCR — AI Receipt Verification</div>
+        </div>
+      </div>
+
+      <div class="flow">
+        <div class="flow-step">📸 Student receipt photo upload karta hai</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">🧠 Gemini AI image scan karta hai</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">📋 UTR + Amount + Date extract</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">👨‍💼 Admin review karta hai</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">✅ Approve → Fee Update</div>
+      </div>
+
+      <div class="code-block" style="margin-top:14px;">
+        <span class="c-gray"># Gemini ko yeh prompt diya jaata hai:</span><br/>
+        <span class="c-green">"""</span><br/>
+        <span class="c-yellow">Analyze this bank transaction receipt/challan.</span><br/>
+        <span class="c-yellow">Extract the following information and return ONLY a valid JSON:</span><br/>
+        <span class="c-blue">{</span><br/>
+        &nbsp;&nbsp;<span class="c-purple">"transaction_id"</span>: <span class="c-pink">"12-16 digit UTR number"</span>,<br/>
+        &nbsp;&nbsp;<span class="c-purple">"amount"</span>: <span class="c-pink">"numeric amount"</span>,<br/>
+        &nbsp;&nbsp;<span class="c-purple">"date"</span>: <span class="c-pink">"DD/MM/YYYY format"</span>,<br/>
+        &nbsp;&nbsp;<span class="c-purple">"confidence"</span>: <span class="c-pink">"High/Medium/Low"</span><br/>
+        <span class="c-blue">}</span><br/>
+        <span class="c-green">"""</span><br/>
+        <br/>
+        <span class="c-gray"># Models tried in order (with retry logic):</span><br/>
+        <span class="c-blue">GEMINI_MODELS</span> = [<span class="c-pink">'gemini-2.5-flash'</span>, <span class="c-pink">'gemini-1.5-flash'</span>, <span class="c-pink">'gemini-1.5-flash-8b'</span>]<br/>
+        <span class="c-gray"># Automatic retry with exponential backoff (2s, 4s, 6s)</span>
+      </div>
+
+      <div class="highlight" style="margin-top:12px;">
+        <div class="highlight-title">🔄 Smart Retry Logic:</div>
+        <p>Agar Gemini API busy/503 hai, system automatically dusre model pe switch karta hai. Max 3 retries per model. Total 3 models available hain — isliye almost kabhi fail nahi hota.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  PAGE 5: N8N WORKFLOW                         -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="page page-break">
+  <div class="content">
+
+    <!-- ── SECTION 8: n8n Workflow ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#fce7f3;">🔁</div>
+        <div>
+          <div class="section-num">Section 08</div>
+          <div class="section-title">n8n Workflow — Automated Alert System</div>
+        </div>
+      </div>
+
+      <p style="color:#475569;margin-bottom:16px;font-size:12.5px;">
+        n8n ek <strong>no-code/low-code workflow automation tool</strong> hai. Hamare project mein yeh <strong>email delivery</strong> aur <strong>Google Sheets logging</strong> ke liye use hota hai.
+        Python backend n8n ko webhook call karta hai — n8n baaki sab kaam karta hai.
+      </p>
+
+      <div class="arch-box">
+        <div class="arch-label" style="margin-bottom:16px;">🔁 n8n Workflow Flow</div>
+
+        <div class="arch-layer">
+          <div class="arch-node" style="background:rgba(139,92,246,0.4);min-width:220px;">
+            <span class="icon">🪝</span>
+            <div class="name">Webhook Trigger</div>
+            <div class="tech">POST /webhook/fee-otp</div>
+          </div>
+        </div>
+        <div class="arch-arrow">↓ email_type field check karo</div>
+
+        <div class="arch-layer">
+          <div class="arch-node">
+            <span class="icon">🔀</span>
+            <div class="name">Switch Node</div>
+            <div class="tech">Route by email_type</div>
+          </div>
+        </div>
+        <div class="arch-arrow" style="font-size:13px;">↙ otp_verify &nbsp;&nbsp;&nbsp; ↓ otp_reset &nbsp;&nbsp;&nbsp; ↘ others</div>
+
+        <div class="arch-layer">
+          <div class="arch-node" style="background:rgba(99,102,241,0.3);">
+            <span class="icon">📧</span>
+            <div class="name">OTP Verify Email</div>
+            <div class="tech">Brevo SMTP → Student</div>
+          </div>
+          <div class="arch-node" style="background:rgba(220,38,38,0.3);">
+            <span class="icon">🔑</span>
+            <div class="name">OTP Reset Email</div>
+            <div class="tech">Brevo SMTP → Admin</div>
+          </div>
+          <div class="arch-node" style="background:rgba(5,150,105,0.3);">
+            <span class="icon">📨</span>
+            <div class="name">Alert/Receipt Email</div>
+            <div class="tech">Brevo SMTP → Student</div>
+          </div>
+        </div>
+
+        <hr class="arch-divider"/>
+
+        <div class="arch-label">📊 Separate Google Sheets Webhook</div>
+        <div class="arch-layer">
+          <div class="arch-node" style="background:rgba(5,150,105,0.4);min-width:180px;">
+            <span class="icon">🪝</span>
+            <div class="name">Sheets Webhook</div>
+            <div class="tech">POST /webhook/payment-sheets</div>
+          </div>
+        </div>
+        <div class="arch-arrow">↓</div>
+        <div class="arch-layer">
+          <div class="arch-node" style="background:rgba(5,150,105,0.3);min-width:220px;">
+            <span class="icon">📊</span>
+            <div class="name">Google Sheets Node</div>
+            <div class="tech">Append Row — 16 Columns</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="card-title">📋 Email Types — Kaunse Kaunse Emails Jaate Hain?</div>
+        <table style="margin-top:8px;">
+          <thead>
+            <tr>
+              <th>email_type</th>
+              <th>Kab Jaata Hai?</th>
+              <th>Recipient</th>
+              <th>Design</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>otp_verify</code></td><td>Admin registration pe</td><td>Admin</td><td>Purple gradient, 6-digit OTP</td></tr>
+            <tr><td><code>otp_reset</code></td><td>Password reset request pe</td><td>Admin</td><td>Red gradient, reset OTP</td></tr>
+            <tr><td><code>overdue</code></td><td>Fee deadline miss hone pe</td><td>Student</td><td>🚨 Red badge, outstanding dues</td></tr>
+            <tr><td><code>partial</code></td><td>Partial payment reminder</td><td>Student</td><td>🔔 Amber badge, remaining amount</td></tr>
+            <tr><td><code>payment_success</code></td><td>Online payment complete hone pe</td><td>Student</td><td>✅ Green header, receipt details</td></tr>
+            <tr><td><code>challan_status</code></td><td>Admin ne challan approve/reject kiya</td><td>Student</td><td>✅/❌ Green/Red, UTR + amount</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <div class="card-title">📊 Google Sheets Columns (16 columns auto-log hote hain)</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
+          <span class="pill pill-blue">Student ID</span>
+          <span class="pill pill-blue">Student Name</span>
+          <span class="pill pill-blue">Email</span>
+          <span class="pill pill-blue">Roll No</span>
+          <span class="pill pill-blue">Course</span>
+          <span class="pill pill-blue">Branch</span>
+          <span class="pill pill-blue">Year</span>
+          <span class="pill pill-green">Receipt ID</span>
+          <span class="pill pill-green">Amount Paid</span>
+          <span class="pill pill-green">Transaction ID</span>
+          <span class="pill pill-green">Payment Method</span>
+          <span class="pill pill-green">Payment Date</span>
+          <span class="pill pill-green">Status</span>
+          <span class="pill pill-yellow">Total Fee</span>
+          <span class="pill pill-yellow">Fee Paid</span>
+          <span class="pill pill-yellow">Remaining Due</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  PAGE 6: DATABASE + BACKEND DETAIL            -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="page page-break">
+  <div class="content">
+
+    <!-- ── SECTION 9: Database Schema ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#d1fae5;">🗄️</div>
+        <div>
+          <div class="section-num">Section 09</div>
+          <div class="section-title">Database Schema (Supabase PostgreSQL)</div>
+        </div>
+      </div>
+
+      <p style="color:#475569;margin-bottom:12px;font-size:12.5px;">
+        Dono backends — Java Spring Boot aur Python Flask — ek hi <strong>Supabase PostgreSQL database</strong> share karte hain.
+        <code>DATABASE_URL</code> environment variable se connect hote hain.
+      </p>
+
+      <table>
+        <thead>
+          <tr><th>Table Name</th><th>Key Columns</th><th>Kaam</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>student</strong></td>
+            <td>id, name, roll_no, email, course, branch, year, category</td>
+            <td>Student ki basic info</td>
+          </tr>
+          <tr>
+            <td><strong>fee</strong></td>
+            <td>id, student_id (FK), total_fee, paid_amount, due_amount, late_fine, deadline, status</td>
+            <td>Fee records — har student ki fee status</td>
+          </tr>
+          <tr>
+            <td><strong>payment</strong></td>
+            <td>id, student_id (FK), amount, method, transaction_id, date</td>
+            <td>Payment transactions history</td>
+          </tr>
+          <tr>
+            <td><strong>offline_receipt</strong></td>
+            <td>id, student_id (FK), file_path, extracted_utr, extracted_amount, extracted_date, ai_confidence, status, upload_date</td>
+            <td>Bank challan uploads + AI extracted data</td>
+          </tr>
+          <tr>
+            <td><strong>admin</strong></td>
+            <td>id, username, email, password_hash, otp, otp_expiry, failed_attempts, lockout_until, is_verified</td>
+            <td>Admin accounts + security fields</td>
+          </tr>
+          <tr>
+            <td><strong>fee_structure</strong></td>
+            <td>id, course, branch, year, amount</td>
+            <td>Fee templates — course/branch ke hisaab se</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── SECTION 10: Python Backend Routes ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#fef9c3;">🐍</div>
+        <div>
+          <div class="section-num">Section 10</div>
+          <div class="section-title">Python Flask Backend — Route Structure</div>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <div class="info-row"><span class="info-key">auth_routes.py</span><span class="info-val">Admin login, register, OTP verify, password reset, brute-force protection</span></div>
+          <div class="info-row"><span class="info-key">student_routes.py</span><span class="info-val">Admin CRUD — students add/edit/delete karna</span></div>
+          <div class="info-row"><span class="info-key">fee_routes.py</span><span class="info-val">Fee assign karna, update karna</span></div>
+          <div class="info-row"><span class="info-key">payment_routes.py</span><span class="info-val">Manual payment entry + Google Sheets log trigger</span></div>
+        </div>
+        <div>
+          <div class="info-row"><span class="info-key">student_portal_routes.py</span><span class="info-val">Razorpay checkout, payment verify, challan upload, AI chat (EduAI)</span></div>
+          <div class="info-row"><span class="info-key">dashboard_routes.py</span><span class="info-val">Analytics stats + challan approval/rejection</span></div>
+          <div class="info-row"><span class="info-key">defaulter_routes.py</span><span class="info-val">Defaulter list + email alert trigger</span></div>
+          <div class="info-row"><span class="info-key">api_routes.py</span><span class="info-val">Secure API endpoints (API token required) — n8n → backend callbacks</span></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px;">
+        <div class="card-title">⏰ Cron Job (Automatic Scheduled Alerts)</div>
+        <div class="grid2">
+          <div>
+            <p style="color:#374151;font-size:12px;margin-bottom:8px;">APScheduler use karke 2 background jobs run karta hai:</p>
+            <ul class="feature-list">
+              <li><strong>Monthly Fee Reminder:</strong> Har mahine ke 1st din, subah 9 baje automatically sabhi defaulters aur partial payers ko email alert jaata hai</li>
+              <li><strong>Keep-Alive Ping:</strong> Har 14 minute mein /health endpoint hit karta hai — Render free tier pe cold start rokne ke liye</li>
+            </ul>
+          </div>
+          <div class="code-block" style="font-size:10.5px;">
+            <span class="c-gray"># Monthly reminder — 1st of every month at 9 AM</span><br/>
+            scheduler.add_job(<br/>
+            &nbsp;&nbsp;func=<span class="c-blue">monthly_fee_reminder_job</span>,<br/>
+            &nbsp;&nbsp;trigger=<span class="c-pink">'cron'</span>,<br/>
+            &nbsp;&nbsp;day=<span class="c-pink">'1'</span>, hour=<span class="c-pink">'9'</span>,<br/>
+            &nbsp;&nbsp;args=[app]<br/>
+            )<br/><br/>
+            <span class="c-gray"># Keep-alive ping every 14 min</span><br/>
+            scheduler.add_job(<br/>
+            &nbsp;&nbsp;func=<span class="c-blue">self_ping_job</span>,<br/>
+            &nbsp;&nbsp;trigger=<span class="c-pink">'interval'</span>,<br/>
+            &nbsp;&nbsp;minutes=<span class="c-yellow">14</span><br/>
+            )
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 11: Java Backend ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#dbeafe;">☕</div>
+        <div>
+          <div class="section-num">Section 11</div>
+          <div class="section-title">Java Spring Boot Backend — Primary API</div>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="card">
+          <div class="card-title">🏗️ Project Structure</div>
+          <ul class="feature-list">
+            <li><strong>config/</strong> — Security, CORS, Database config</li>
+            <li><strong>controllers/</strong> — REST API endpoints</li>
+            <li><strong>models/</strong> — JPA Entity classes (Student, Fee, Payment)</li>
+            <li><strong>repositories/</strong> — Spring Data JPA interfaces</li>
+            <li><strong>services/</strong> — Business logic layer</li>
+            <li><strong>utils/</strong> — Helper utilities</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title">🐋 Docker Deployment (Render)</div>
+          <ul class="feature-list">
+            <li>Dockerfile included in backend-java/</li>
+            <li>Maven build se JAR file banta hai</li>
+            <li>Render pe Docker container run karta hai</li>
+            <li>DatabaseInitializer — startup pe auto-schema migration</li>
+            <li>failed_attempts + lockout_until columns auto-add</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  PAGE 7: FRONTEND + ENV + HOW IT ALL CONNECTS -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="page page-break">
+  <div class="content">
+
+    <!-- ── SECTION 12: Frontend ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#ede9fe;">⚛️</div>
+        <div>
+          <div class="section-num">Section 12</div>
+          <div class="section-title">Next.js Frontend — Pages &amp; Structure (Vercel Deployed)</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <div class="card" style="border-left:4px solid #4f46e5;">
+            <div class="card-title">🔐 Admin Pages</div>
+            <ul class="feature-list">
+              <li><code>/login</code> — Admin login with brute-force UI</li>
+              <li><code>/register</code> — Admin registration + OTP verify</li>
+              <li><code>/forgot-password</code> — Password reset flow</li>
+              <li><code>/verify</code> — OTP verification page</li>
+              <li><code>/</code> (page.tsx) — Main dashboard with charts</li>
+              <li><code>/dashboard</code> — Admin overview</li>
+            </ul>
+          </div>
+          <div class="card" style="border-left:4px solid #0891b2;margin-top:14px;">
+            <div class="card-title">📊 Management Pages</div>
+            <ul class="feature-list">
+              <li><code>/students</code> — Student list, search, filter</li>
+              <li><code>/fees</code> — Fee records overview</li>
+              <li><code>/fee</code> — Individual fee details</li>
+              <li><code>/payments</code> — Transaction history</li>
+              <li><code>/defaulters</code> — Defaulter list + alert buttons</li>
+              <li><code>/reports</code> — Report generation + download</li>
+            </ul>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="border-left:4px solid #059669;">
+            <div class="card-title">🎓 Student Pages</div>
+            <ul class="feature-list">
+              <li><code>/student-login</code> — Roll No + Email OTP login</li>
+              <li><code>/student-dashboard</code> — Student portal:
+                <ul style="margin-left:16px;margin-top:4px;">
+                  <li>Fee status cards</li>
+                  <li>Razorpay payment button</li>
+                  <li>Challan upload form</li>
+                  <li>Payment history</li>
+                  <li>EduAI chat interface</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <div class="card" style="border-left:4px solid #8b5cf6;margin-top:14px;">
+            <div class="card-title">🔧 Technical Setup</div>
+            <ul class="feature-list">
+              <li>Next.js 14 App Router architecture</li>
+              <li>TypeScript throughout</li>
+              <li>Tailwind CSS for styling</li>
+              <li>Lucide React icons</li>
+              <li><code>utils/api.ts</code> — Centralized API calls</li>
+              <li><code>components/Sidebar.tsx</code> — Collapsible nav</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 13: Environment Variables ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#fef3c7;">🔑</div>
+        <div>
+          <div class="section-num">Section 13</div>
+          <div class="section-title">Environment Variables — Kya Kya Set Karna Padta Hai?</div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <span class="c-gray"># ─── Gemini AI (OCR Receipt Scanning) ───────────────────</span><br/>
+        <span class="c-blue">GEMINI_API_KEY</span>=<span class="c-pink">your_gemini_api_key</span> &nbsp;&nbsp;&nbsp;<span class="c-gray"># Google AI Studio se milega</span><br/><br/>
+
+        <span class="c-gray"># ─── n8n Webhooks ────────────────────────────────────────</span><br/>
+        <span class="c-blue">N8N_WEBHOOK_URL</span>=<span class="c-pink">https://your-n8n.com/webhook/fee-otp</span> &nbsp;<span class="c-gray"># Primary email webhook</span><br/>
+        <span class="c-blue">N8N_SHEETS_WEBHOOK_URL</span>=<span class="c-pink">https://your-n8n.com/webhook/payment-sheets</span> &nbsp;<span class="c-gray"># Sheets logger</span><br/><br/>
+
+        <span class="c-gray"># ─── Secure API Token ────────────────────────────────────</span><br/>
+        <span class="c-blue">API_TOKEN</span>=<span class="c-pink">your_secure_random_token</span> &nbsp;<span class="c-gray"># n8n → backend callback secure karta hai</span><br/><br/>
+
+        <span class="c-gray"># ─── Database ────────────────────────────────────────────</span><br/>
+        <span class="c-blue">DATABASE_URL</span>=<span class="c-pink">postgresql://user:pass@host:port/postgres</span> &nbsp;<span class="c-gray"># Supabase connection</span><br/><br/>
+
+        <span class="c-gray"># ─── Razorpay ────────────────────────────────────────────</span><br/>
+        <span class="c-blue">RAZORPAY_KEY_ID</span>=<span class="c-pink">rzp_test_xxx</span><br/>
+        <span class="c-blue">RAZORPAY_KEY_SECRET</span>=<span class="c-pink">your_secret</span> &nbsp;<span class="c-gray"># dashboard.razorpay.com → API Keys</span><br/><br/>
+
+        <span class="c-gray"># ─── Frontend URL ────────────────────────────────────────</span><br/>
+        <span class="c-blue">FRONTEND_URL</span>=<span class="c-pink">https://your-vercel-app.vercel.app</span> &nbsp;<span class="c-gray"># Email links ke liye</span><br/>
+        <span class="c-blue">RENDER_EXTERNAL_URL</span>=<span class="c-pink">https://your-backend.onrender.com</span> &nbsp;<span class="c-gray"># Keep-alive ke liye</span>
+      </div>
+
+      <div class="warning-box">
+        <p><strong>⚠️ Important:</strong> .env file kabhi bhi Git mein commit mat karo! .gitignore mein already add kiya gaya hai. Vercel aur Render ke environment variables section mein manually set karo.</p>
+      </div>
+    </div>
+
+    <!-- ── SECTION 14: Complete Data Flow ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#d1fae5;">🔄</div>
+        <div>
+          <div class="section-num">Section 14</div>
+          <div class="section-title">Complete Data Flow — Ek Payment Kaise Hoti Hai?</div>
+        </div>
+      </div>
+
+      <div style="counter-reset:step;">
+        <div class="info-row">
+          <span class="pill pill-purple" style="min-width:24px;text-align:center;">1</span>
+          <span class="info-val"><strong>Student</strong> Vercel frontend pe /student-login pe jaata hai → Roll No + Email deta hai</span>
+        </div>
+        <div class="info-row">
+          <span class="pill pill-purple" style="min-width:24px;text-align:center;">2</span>
+          <span class="info-val"><strong>Python Flask</strong> OTP generate karta hai → n8n webhook call karta hai (email_type: otp_verify)</span>
+        </div>
+        <div class="info-row">
+          <span class="pill pill-purple" style="min-width:24px;text-align:center;">3</span>
+          <span class="info-val"><strong>n8n</strong> OTP email Brevo se bhejta hai → Student OTP dalta hai → Dashboard access milta hai</span>
+        </div>
+        <div class="info-row">
+          <span class="pill pill-blue" style="min-width:24px;text-align:center;">4</span>
+          <span class="info-val"><strong>Student</strong> apni fee status dekhta hai → "Pay Now" click karta hai → Amount enter karta hai</span>
+        </div>
+        <div class="info-row">
+          <span class="pill pill-blue" style="min-width:24px;text-align:center;">5</span>
+          <span class="info-val"><strong>Python Flask</strong> Razorpay Order create karta hai → Frontend pe Razorpay checkout window khulti hai</span>
+        </div>
+        <div class="info-row">
+          <span class="pill pill-blue" style="min-width:24px;text-align:center;">6</span>
+          <span class="info-val"><strong>Student</strong> UPI/Card se pay karta hai → Razorpay payment ID milta hai</span>
+        </div>
+        <div class="info-row">
+          <span class="pill pill-green" style="min-width:24px;text-align:center;">7</span>
+          <span class="info-val"><strong>Python Flask</strong> Razorpay signature verify karta hai → Fee record update karta hai → Payment save karta hai</span>
+        </div>
+        <div class="info-row">
+          <span class="pill pill-green" style="min-width:24px;text-align:center;">8</span>
+          <span class="info-val"><strong>n8n webhook</strong> call hota hai → Brevo se "Payment Success" email jaata hai student ko</span>
+        </div>
+        <div class="info-row">
+          <span class="pill pill-green" style="min-width:24px;text-align:center;">9</span>
+          <span class="info-val"><strong>Google Sheets webhook</strong> call hota hai → 16 columns ke saath payment row automatically Google Sheets mein append ho jaata hai</span>
+        </div>
+      </div>
+
+      <div class="success-box">
+        <p>✅ <strong>Poora flow automated hai!</strong> Admin ko kuch bhi manually karne ki zaroorat nahi — payment se email tak sab automatic hota hai.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  PAGE 8: SUMMARY + QUICK REFERENCE            -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="page page-break">
+  <div class="content">
+
+    <!-- ── SECTION 15: Project Summary ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#ede9fe;">📋</div>
+        <div>
+          <div class="section-num">Section 15</div>
+          <div class="section-title">Project Summary — Quick Reference Card</div>
+        </div>
+      </div>
+
+      <div class="arch-box">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+          <div>
+            <p style="color:#a5b4fc;font-size:10px;text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:12px;">🌐 Live URLs</p>
+            <div class="info-row" style="gap:8px;">
+              <span style="color:#818cf8;font-size:11px;font-weight:600;min-width:90px;">Frontend:</span>
+              <span style="color:#e0e7ff;font-size:11px;">Vercel (Next.js 14)</span>
+            </div>
+            <div class="info-row" style="gap:8px;">
+              <span style="color:#818cf8;font-size:11px;font-weight:600;min-width:90px;">Java API:</span>
+              <span style="color:#e0e7ff;font-size:11px;">Render.com</span>
+            </div>
+            <div class="info-row" style="gap:8px;">
+              <span style="color:#818cf8;font-size:11px;font-weight:600;min-width:90px;">Python API:</span>
+              <span style="color:#e0e7ff;font-size:11px;">Render.com</span>
+            </div>
+            <div class="info-row" style="gap:8px;">
+              <span style="color:#818cf8;font-size:11px;font-weight:600;min-width:90px;">Database:</span>
+              <span style="color:#e0e7ff;font-size:11px;">Supabase PostgreSQL</span>
+            </div>
+            <div class="info-row" style="gap:8px;">
+              <span style="color:#818cf8;font-size:11px;font-weight:600;min-width:90px;">n8n:</span>
+              <span style="color:#e0e7ff;font-size:11px;">Cloud / Self-hosted</span>
+            </div>
+          </div>
+          <div>
+            <p style="color:#a5b4fc;font-size:10px;text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:12px;">⚡ Key Features</p>
+            <div style="font-size:11px;color:#e0e7ff;line-height:2;">
+              ✓ OTP-based Authentication<br/>
+              ✓ Razorpay Online Payments<br/>
+              ✓ Gemini AI OCR (Bank Receipts)<br/>
+              ✓ Automated Email Alerts (n8n + Brevo)<br/>
+              ✓ Google Sheets Auto-Logging<br/>
+              ✓ Brute-Force Protection (5 attempts)<br/>
+              ✓ Cron Job (Monthly Auto-Alerts)<br/>
+              ✓ EduAI Chatbot (Gemini)<br/>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;">
+        <div class="card-title" style="margin-bottom:12px;font-size:15px;color:#1e1b4b;">🎯 Is Project Mein Kya Seekha / Kya Banaya?</div>
+
+        <div class="grid3">
+          <div class="card" style="text-align:center;">
+            <div style="font-size:28px;margin-bottom:8px;">🏗️</div>
+            <div class="card-title" style="font-size:12px;">Microservices Architecture</div>
+            <p style="font-size:11px;">Ek hi project mein Java + Python + Next.js — sab ek saath kaam karte hain</p>
+          </div>
+          <div class="card" style="text-align:center;">
+            <div style="font-size:28px;margin-bottom:8px;">🤖</div>
+            <div class="card-title" style="font-size:12px;">AI Integration</div>
+            <p style="font-size:11px;">Gemini 2.5 Flash se real document OCR — real-world AI use case</p>
+          </div>
+          <div class="card" style="text-align:center;">
+            <div style="font-size:28px;margin-bottom:8px;">🔁</div>
+            <div class="card-title" style="font-size:12px;">Workflow Automation</div>
+            <p style="font-size:11px;">n8n se no-code automation — email + sheets — enterprise pattern</p>
+          </div>
+          <div class="card" style="text-align:center;">
+            <div style="font-size:28px;margin-bottom:8px;">💳</div>
+            <div class="card-title" style="font-size:12px;">Payment Gateway</div>
+            <p style="font-size:11px;">Razorpay integration — real payment flows with webhook verification</p>
+          </div>
+          <div class="card" style="text-align:center;">
+            <div style="font-size:28px;margin-bottom:8px;">🛡️</div>
+            <div class="card-title" style="font-size:12px;">Security</div>
+            <p style="font-size:11px;">OTP auth, brute-force protection, API token security, CORS</p>
+          </div>
+          <div class="card" style="text-align:center;">
+            <div style="font-size:28px;margin-bottom:8px;">☁️</div>
+            <div class="card-title" style="font-size:12px;">Cloud Deployment</div>
+            <p style="font-size:11px;">Vercel + Render + Supabase — free tier pe full-stack production app</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="highlight" style="margin-top:20px;">
+        <div class="highlight-title" style="font-size:15px;">🚀 Is Project Ko Kaise Run Karte Hain? (Local Development)</div>
+        <div class="code-block" style="margin-top:10px;font-size:11px;">
+          <span class="c-gray"># Option 1: Windows one-click</span><br/>
+          <span class="c-green">run_project.bat</span><br/><br/>
+
+          <span class="c-gray"># Option 2: Manual (3 terminals mein)</span><br/>
+          <span class="c-gray"># Terminal 1 — Frontend</span><br/>
+          <span class="c-blue">cd frontend</span> &amp;&amp; <span class="c-green">npm install</span> &amp;&amp; <span class="c-green">npm run dev</span>  <span class="c-gray"># Port 3000</span><br/><br/>
+          <span class="c-gray"># Terminal 2 — Java Backend</span><br/>
+          <span class="c-blue">cd backend-java</span> &amp;&amp; <span class="c-green">mvn spring-boot:run</span>  <span class="c-gray"># Port 8080</span><br/><br/>
+          <span class="c-gray"># Terminal 3 — Python Backend</span><br/>
+          <span class="c-green">python -m venv venv</span> &amp;&amp; <span class="c-green">venv\Scripts\activate</span><br/>
+          <span class="c-green">pip install -r requirements.txt</span><br/>
+          <span class="c-blue">cd backend-python</span> &amp;&amp; <span class="c-green">python app.py</span>  <span class="c-gray"># Port 5000</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>
+      <strong>Fee Defaulter System</strong> — Enterprise Fee Management &amp; Automated Alert Platform<br/>
+      <span style="margin-top:6px;display:block;">Developed with ❤️ for educational institutions | Tech Stack: Next.js · Java Spring Boot · Python Flask · Supabase · Razorpay · Gemini AI · n8n · Brevo</span>
+    </p>
+    <p style="margin-top:12px;font-size:10px;color:#64748b;">
+      Deployed: Vercel (Frontend) · Render (Backend) · Supabase (Database) · n8n (Automation)
+    </p>
+  </div>
+</div>
+
+<script>
+  // Auto-remove print button during print
+  window.addEventListener('beforeprint', () => {
+    document.querySelector('.print-btn').style.display = 'none';
+  });
+  window.addEventListener('afterprint', () => {
+    document.querySelector('.print-btn').style.display = 'block';
+  });
+</script>
+
+</body>
+</html>
